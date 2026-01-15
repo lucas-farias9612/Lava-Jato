@@ -36,12 +36,12 @@ const Dashboard: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Bom dia, Admin</h1>
-          <p className="text-gray-500 text-sm">Aqui está o que está acontecendo no Lava Jato hoje.</p>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Painel Executivo</h1>
+          <p className="text-gray-500 text-sm">Visão geral do desempenho do Lava Jato em Rio Verde.</p>
         </div>
         <div className="flex gap-2">
           <button className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-semibold hover:bg-gray-50 shadow-sm transition-all">Exportar Dados</button>
-          <button className="px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 shadow-lg shadow-red-100 transition-all">Novo Serviço</button>
+          <button className="px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-700 shadow-lg shadow-red-100 transition-all">Novo Serviço</button>
         </div>
       </div>
 
