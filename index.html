@@ -4,129 +4,337 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lava Jato Pro - Gestão & NFe</title>
+    <title>Lava Jato Pro - Rio Verde-GO</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-      body { font-family: 'Inter', sans-serif; background-color: #f9fafb; margin: 0; overflow: hidden; }
-      .nav-active { background-color: #dc2626 !important; color: white !important; box-shadow: 0 4px 6px -1px rgb(220 38 38 / 0.1); }
-      .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-      .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
-      .custom-scrollbar::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
-      .animate-fade-in { animation: fadeIn 0.4s ease-out; }
-      @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+      body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; margin: 0; overflow: hidden; }
+      .nav-active { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important; color: white !important; box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.2); }
+      .nav-active i { color: white !important; }
+      .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+      .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+      .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+      .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(241, 245, 249, 1); }
+      #sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+      .sidebar-collapsed { width: 80px !important; }
+      .sidebar-collapsed .sidebar-text, .sidebar-collapsed .sidebar-tag { display: none !important; }
     </style>
-    <script type="importmap">
+  <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@18.3.1",
-    "react-dom": "https://esm.sh/react-dom@18.3.1",
-    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
-    "lucide-react": "https://esm.sh/lucide-react@0.460.0?external=react",
-    "recharts": "https://esm.sh/recharts@2.12.7?external=react,react-dom",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "recharts": "https://esm.sh/recharts@^3.6.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
     "react/": "https://esm.sh/react@^19.2.3/"
   }
 }
 </script>
-  </head>
+</head>
   <body>
-    <div class="flex h-screen bg-gray-50 text-gray-900 overflow-hidden">
+    <div class="flex h-screen overflow-hidden">
       <!-- SIDEBAR -->
-      <aside id="sidebar" class="bg-white border-r border-gray-200 w-64 flex flex-col z-20 shadow-sm transition-all duration-300">
-        <div class="p-5 flex items-center gap-3 border-b border-gray-100">
-          <div class="bg-red-600 p-2 rounded-lg text-white shadow-lg shadow-red-100">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/></svg>
+      <aside id="sidebar" class="bg-white border-r border-slate-200 w-64 flex flex-col z-30 shadow-sm">
+        <div class="p-6 flex items-center gap-3 shrink-0">
+          <div class="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-red-200">
+            <i data-lucide="shield-check"></i>
           </div>
-          <span class="font-bold text-lg tracking-tight sidebar-text">LavaJato<span class="text-red-600">Pro</span></span>
+          <span class="font-extrabold text-xl tracking-tight sidebar-text">LAVA<span class="text-red-600">PRO</span></span>
         </div>
         
-        <nav class="flex-1 p-3 space-y-1">
-          <button onclick="window.switchView('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 p-3 rounded-xl transition-all nav-active">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
-            <span class="font-medium sidebar-text">Painel Geral</span>
-          </button>
-          <button onclick="window.switchView('invoices')" id="nav-invoices" class="nav-item w-full flex items-center gap-3 p-3 rounded-xl transition-all text-gray-500 hover:bg-gray-100">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5V19"/><path d="M12 5v1.5"/></svg>
-            <span class="font-medium sidebar-text">Serviços & NFe</span>
-          </button>
-          <button onclick="window.switchView('financial')" id="nav-financial" class="nav-item w-full flex items-center gap-3 p-3 rounded-xl transition-all text-gray-500 hover:bg-gray-100">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a2 2 0 0 0 0 4h15a1 1 0 0 0 1-1v-2"/><path d="M6.41 15.59a2 2 0 1 1-2.82-2.82"/><circle cx="11.5" cy="11.5" r="1.5"/><circle cx="15.5" cy="11.5" r="1.5"/><circle cx="13.5" cy="15.5" r="1.5"/></svg>
-            <span class="font-medium sidebar-text">Financeiro</span>
-          </button>
-          <button onclick="window.switchView('customers')" id="nav-customers" class="nav-item w-full flex items-center gap-3 p-3 rounded-xl transition-all text-gray-500 hover:bg-gray-100">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            <span class="font-medium sidebar-text">Clientes</span>
+        <nav class="flex-1 px-4 space-y-1 mt-4 overflow-y-auto custom-scrollbar">
+          <button onclick="navigateTo('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 p-3.5 rounded-xl transition-all font-semibold nav-active text-sm text-left">
+            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+            <span class="sidebar-text">Dashboard</span>
           </button>
           
-          <div class="pt-4 pb-2 px-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest sidebar-text">Links Externos</div>
-          <a href="https://servicos.rioverde.go.gov.br/" target="_blank" class="w-full flex items-center gap-3 p-3 rounded-xl text-gray-500 hover:bg-blue-50 hover:text-blue-600 transition-all">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
-            <span class="font-medium sidebar-text">Portal Rio Verde</span>
+          <button onclick="navigateTo('invoices')" id="nav-invoices" class="nav-item w-full flex items-center gap-3 p-3.5 rounded-xl transition-all font-semibold text-slate-500 hover:bg-slate-50 text-sm text-left">
+            <i data-lucide="receipt" class="w-5 h-5"></i>
+            <span class="sidebar-text">Serviços & NFe</span>
+          </button>
+
+          <button onclick="navigateTo('financial')" id="nav-financial" class="nav-item w-full flex items-center gap-3 p-3.5 rounded-xl transition-all font-semibold text-slate-500 hover:bg-slate-50 text-sm text-left">
+            <i data-lucide="banknote" class="w-5 h-5"></i>
+            <span class="sidebar-text">Financeiro</span>
+          </button>
+
+          <button onclick="navigateTo('customers')" id="nav-customers" class="nav-item w-full flex items-center gap-3 p-3.5 rounded-xl transition-all font-semibold text-slate-500 hover:bg-slate-50 text-sm text-left">
+            <i data-lucide="users" class="w-5 h-5"></i>
+            <span class="sidebar-text">Clientes</span>
+          </button>
+          
+          <div class="h-px bg-slate-100 my-6"></div>
+          
+          <div class="px-3 mb-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest sidebar-text">Portal Externo</div>
+          <a href="https://servicos.rioverde.go.gov.br/" target="_blank" class="flex items-center gap-3 p-3.5 rounded-xl text-blue-600 font-bold hover:bg-blue-50 transition-all text-sm group">
+            <i data-lucide="external-link" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+            <span class="sidebar-text">NFe Rio Verde</span>
           </a>
         </nav>
 
-        <div class="p-3 border-t border-gray-100">
-           <button class="w-full flex items-center gap-3 p-3 text-gray-500 hover:bg-gray-100 rounded-xl transition-colors">
-             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1-1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-             <span class="font-medium sidebar-text">Configurações</span>
-           </button>
+        <div class="p-4 border-t border-slate-100 shrink-0">
+           <div class="bg-slate-50 rounded-2xl p-4 sidebar-text">
+             <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Status Fiscal</p>
+             <div class="flex items-center gap-2 text-green-600 font-bold text-xs">
+               <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+               Sincronizado
+             </div>
+           </div>
         </div>
       </aside>
 
-      <!-- MAIN CONTENT AREA -->
-      <main class="flex-1 flex flex-col overflow-hidden relative">
-        <!-- HEADER -->
-        <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 shrink-0 z-10">
-          <button onclick="toggleSidebar()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-          </button>
+      <!-- MAIN AREA -->
+      <main class="flex-1 flex flex-col min-w-0 bg-[#f8fafc] relative">
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 z-20 shrink-0">
+          <div class="flex items-center gap-4">
+            <button onclick="toggleSidebar()" class="p-2 text-slate-500 hover:bg-slate-50 rounded-lg transition-colors">
+              <i data-lucide="menu" class="w-5 h-5"></i>
+            </button>
+            <h2 id="view-title" class="font-bold text-slate-800">Painel de Controle</h2>
+          </div>
           
-          <div class="flex items-center gap-6">
-            <div class="flex items-center gap-3">
-              <div class="text-right hidden sm:block">
-                <p class="text-sm font-bold">Admin Rio Verde</p>
-                <p class="text-xs text-gray-400 font-medium">Unidade Central</p>
-              </div>
-              <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-red-600 to-red-400 flex items-center justify-center text-white font-bold shadow-inner">AD</div>
+          <div class="flex items-center gap-4">
+            <div class="hidden sm:block text-right">
+              <p class="text-xs font-bold text-slate-900 leading-tight">Admin Lava Jato</p>
+              <p class="text-[10px] text-slate-400 font-semibold tracking-wide uppercase">Rio Verde, GO</p>
             </div>
+            <div class="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white font-bold text-sm shadow-xl shadow-slate-200 uppercase">RV</div>
           </div>
         </header>
 
-        <!-- DYNAMIC REACT VIEW -->
-        <div id="root" class="flex-1 overflow-y-auto p-6 bg-[#f9fafb] custom-scrollbar min-h-0">
-          <div class="flex items-center justify-center h-full text-gray-400 font-medium animate-pulse">
-            Iniciando LavaJatoPro...
-          </div>
+        <!-- CONTENT VIEW -->
+        <div id="content" class="flex-1 overflow-y-auto p-8 custom-scrollbar">
+           <!-- Dynamic content here -->
         </div>
       </main>
     </div>
 
-    <script>
-      function toggleSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const texts = document.querySelectorAll('.sidebar-text');
-        if (sidebar.classList.contains('w-64')) {
-          sidebar.classList.replace('w-64', 'w-20');
-          texts.forEach(t => t.classList.add('hidden'));
-        } else {
-          sidebar.classList.replace('w-20', 'w-64');
-          texts.forEach(t => t.classList.remove('hidden'));
-        }
-      }
+    <script type="module">
+      // Templates das Páginas
+      const views = {
+        dashboard: `
+          <div class="animate-fade-in space-y-8 pb-10">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Painel de Controle</h1>
+                <p class="text-slate-500 text-sm font-medium">Relatório em tempo real do seu estabelecimento.</p>
+              </div>
+            </div>
 
-      window.switchView = function(viewId) {
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div class="glass-card p-6 rounded-3xl shadow-sm border-b-4 border-emerald-500">
+                <div class="flex justify-between items-start mb-4">
+                  <div class="p-3 bg-emerald-50 text-emerald-600 rounded-2xl"><i data-lucide="dollar-sign"></i></div>
+                  <div class="text-[10px] font-extrabold px-2 py-1 bg-green-100 text-green-700 rounded-full">+15%</div>
+                </div>
+                <p class="text-[11px] text-slate-400 font-bold uppercase">Faturamento</p>
+                <h3 class="text-2xl font-black text-slate-900">R$ 18.940,00</h3>
+              </div>
+              <div class="glass-card p-6 rounded-3xl shadow-sm border-b-4 border-blue-500">
+                <div class="flex justify-between items-start mb-4">
+                  <div class="p-3 bg-blue-50 text-blue-600 rounded-2xl"><i data-lucide="file-text"></i></div>
+                  <div class="text-[10px] font-extrabold px-2 py-1 bg-blue-100 text-blue-700 rounded-full">OK</div>
+                </div>
+                <p class="text-[11px] text-slate-400 font-bold uppercase">Notas Emitidas</p>
+                <h3 class="text-2xl font-black text-slate-900">84/90</h3>
+              </div>
+              <div class="glass-card p-6 rounded-3xl shadow-sm border-b-4 border-indigo-500">
+                <div class="flex justify-between items-start mb-4">
+                  <div class="p-3 bg-indigo-50 text-indigo-600 rounded-2xl"><i data-lucide="users"></i></div>
+                  <div class="text-[10px] font-extrabold px-2 py-1 bg-green-100 text-green-700 rounded-full">+4</div>
+                </div>
+                <p class="text-[11px] text-slate-400 font-bold uppercase">Novos Clientes</p>
+                <h3 class="text-2xl font-black text-slate-900">24</h3>
+              </div>
+              <div class="glass-card p-6 rounded-3xl shadow-sm border-b-4 border-orange-500">
+                <div class="flex justify-between items-start mb-4">
+                  <div class="p-3 bg-orange-50 text-orange-600 rounded-2xl"><i data-lucide="clock"></i></div>
+                </div>
+                <p class="text-[11px] text-slate-400 font-bold uppercase">Aguardando</p>
+                <h3 class="text-2xl font-black text-slate-900">06 Carros</h3>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div class="lg:col-span-2 glass-card p-8 rounded-3xl shadow-sm h-96 flex flex-col">
+                <h3 class="font-bold text-slate-800 mb-6">Desempenho Semanal</h3>
+                <div class="flex-1 relative flex items-end gap-2">
+                  <div class="flex-1 bg-red-100 rounded-t-xl hover:bg-red-500 transition-all cursor-pointer h-[40%]"></div>
+                  <div class="flex-1 bg-red-200 rounded-t-xl hover:bg-red-500 transition-all cursor-pointer h-[60%]"></div>
+                  <div class="flex-1 bg-red-300 rounded-t-xl hover:bg-red-500 transition-all cursor-pointer h-[50%]"></div>
+                  <div class="flex-1 bg-red-400 rounded-t-xl hover:bg-red-500 transition-all cursor-pointer h-[80%]"></div>
+                  <div class="flex-1 bg-red-500 rounded-t-xl h-[100%]"></div>
+                  <div class="flex-1 bg-red-200 rounded-t-xl hover:bg-red-500 transition-all cursor-pointer h-[70%]"></div>
+                  <div class="flex-1 bg-red-100 rounded-t-xl hover:bg-red-500 transition-all cursor-pointer h-[30%]"></div>
+                </div>
+              </div>
+              <div class="glass-card p-8 rounded-3xl shadow-sm overflow-hidden">
+                <h3 class="font-bold text-slate-800 mb-6">Últimos Serviços</h3>
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between border-b border-slate-50 pb-3">
+                    <div>
+                      <p class="text-sm font-bold">Toyota Hilux</p>
+                      <p class="text-[10px] text-slate-400 font-bold uppercase">Lavagem Americana</p>
+                    </div>
+                    <span class="text-sm font-black text-red-600">R$ 150</span>
+                  </div>
+                  <div class="flex items-center justify-between border-b border-slate-50 pb-3">
+                    <div>
+                      <p class="text-sm font-bold">Honda Civic</p>
+                      <p class="text-[10px] text-slate-400 font-bold uppercase">Polimento</p>
+                    </div>
+                    <span class="text-sm font-black text-red-600">R$ 350</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <p class="text-sm font-bold">Jeep Compass</p>
+                      <p class="text-[10px] text-slate-400 font-bold uppercase">Higienização</p>
+                    </div>
+                    <span class="text-sm font-black text-red-600">R$ 280</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        invoices: `
+          <div class="animate-fade-in space-y-6">
+            <div class="flex items-center justify-between">
+              <div>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight uppercase">Serviços & NFe</h1>
+                <p class="text-slate-500 text-sm font-medium">Controle fiscal integrado com Rio Verde-GO.</p>
+              </div>
+              <a href="https://servicos.rioverde.go.gov.br/" target="_blank" class="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all flex items-center gap-2">
+                <i data-lucide="external-link" class="w-4 h-4"></i> Abrir Portal Rio Verde
+              </a>
+            </div>
+
+            <div class="glass-card rounded-3xl overflow-hidden shadow-sm">
+              <table class="w-full text-left">
+                <thead class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  <tr>
+                    <th class="px-6 py-4">Data</th>
+                    <th class="px-6 py-4">Cliente</th>
+                    <th class="px-6 py-4">Serviço</th>
+                    <th class="px-6 py-4">Valor</th>
+                    <th class="px-6 py-4">NFe Status</th>
+                    <th class="px-6 py-4 text-right">Ação</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4 text-xs font-bold text-slate-400">27 Out</td>
+                    <td class="px-6 py-4 font-bold text-slate-800">João Paulo Silva</td>
+                    <td class="px-6 py-4 text-xs">Lavagem Americana + Cera</td>
+                    <td class="px-6 py-4 font-black text-red-600">R$ 120,00</td>
+                    <td class="px-6 py-4"><span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-bold uppercase tracking-wider">Emitida</span></td>
+                    <td class="px-6 py-4 text-right"><button class="p-2 text-slate-300 hover:text-red-500"><i data-lucide="eye"></i></button></td>
+                  </tr>
+                  <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4 text-xs font-bold text-slate-400">27 Out</td>
+                    <td class="px-6 py-4 font-bold text-slate-800">Beatriz Oliveira</td>
+                    <td class="px-6 py-4 text-xs">Polimento Técnico</td>
+                    <td class="px-6 py-4 font-black text-red-600">R$ 450,00</td>
+                    <td class="px-6 py-4"><span class="px-3 py-1 bg-amber-50 text-amber-600 rounded-full text-[10px] font-bold uppercase tracking-wider">Pendente</span></td>
+                    <td class="px-6 py-4 text-right"><button class="px-3 py-1.5 bg-red-600 text-white rounded-lg text-[10px] font-bold uppercase">Emitir Agora</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `,
+        financial: `
+          <div class="animate-fade-in space-y-6">
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight uppercase">Gestão Financeira</h1>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div class="bg-slate-900 rounded-[2rem] p-8 text-white shadow-2xl relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-red-600/20 rounded-full blur-3xl"></div>
+                <p class="text-xs font-bold opacity-50 uppercase tracking-widest mb-2">Saldo Disponível</p>
+                <h2 class="text-4xl font-black mb-10">R$ 12.450,00</h2>
+                <div class="flex gap-4">
+                  <button class="flex-1 bg-white/10 hover:bg-white/20 p-3 rounded-2xl text-xs font-bold uppercase transition-all">Entrada</button>
+                  <button class="flex-1 bg-red-600 hover:bg-red-700 p-3 rounded-2xl text-xs font-bold uppercase transition-all">Saída</button>
+                </div>
+              </div>
+              <div class="lg:col-span-2 glass-card p-8 rounded-[2rem] shadow-sm">
+                <h3 class="font-bold text-slate-800 mb-6">Fluxo de Caixa Mensal</h3>
+                <div class="h-48 bg-slate-50 rounded-2xl border border-dashed border-slate-200 flex items-center justify-center text-slate-400 text-xs font-bold">
+                  Gráfico Consolidado Indisponível (Semana de Teste)
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        customers: `
+          <div class="animate-fade-in space-y-6">
+             <div class="flex items-center justify-between">
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight uppercase">Base de Clientes</h1>
+                <button class="px-6 py-3 bg-red-600 text-white rounded-xl font-bold text-sm shadow-xl shadow-red-100 uppercase tracking-widest hover:scale-105 transition-all">Novo Cadastro</button>
+             </div>
+             <div class="glass-card rounded-3xl overflow-hidden shadow-sm">
+               <table class="w-full text-left">
+                  <thead class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    <tr>
+                      <th class="px-6 py-4">Nome</th>
+                      <th class="px-6 py-4">Veículo</th>
+                      <th class="px-6 py-4">Fidelidade</th>
+                      <th class="px-6 py-4">Última Visita</th>
+                      <th class="px-6 py-4 text-right">Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="hover:bg-slate-50 transition-colors border-b border-slate-50">
+                      <td class="px-6 py-4 font-bold text-slate-800 italic">Ricardo Alencar</td>
+                      <td class="px-6 py-4 text-xs">Toyota Corolla 2023</td>
+                      <td class="px-6 py-4"><span class="px-2 py-1 bg-red-50 text-red-600 rounded text-[10px] font-black">VIP</span></td>
+                      <td class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Ontem</td>
+                      <td class="px-6 py-4 text-right"><i data-lucide="more-vertical" class="ml-auto w-4 h-4 text-slate-300"></i></td>
+                    </tr>
+                  </tbody>
+               </table>
+             </div>
+          </div>
+        `
+      };
+
+      // Gerenciador de Navegação
+      window.navigateTo = function(viewId) {
+        // Update Buttons
         document.querySelectorAll('.nav-item').forEach(btn => {
           btn.classList.remove('nav-active');
-          btn.classList.add('text-gray-500', 'hover:bg-gray-100');
+          btn.classList.add('text-slate-500', 'hover:bg-slate-50');
         });
         const activeBtn = document.getElementById('nav-' + viewId);
         if (activeBtn) {
           activeBtn.classList.add('nav-active');
-          activeBtn.classList.remove('text-gray-500', 'hover:bg-gray-100');
+          activeBtn.classList.remove('text-slate-500', 'hover:bg-slate-50');
         }
-        window.dispatchEvent(new CustomEvent('change-view', { detail: viewId }));
+
+        // Update Title
+        const titles = { dashboard: 'Dashboard Geral', invoices: 'Emissão de NFe', financial: 'Controle de Caixa', customers: 'Gestão de Clientes' };
+        document.getElementById('view-title').innerText = titles[viewId] || 'Lava Jato Pro';
+
+        // Update Content
+        const contentDiv = document.getElementById('content');
+        contentDiv.innerHTML = views[viewId] || views.dashboard;
+        
+        // Re-initialize Icons
+        lucide.createIcons();
       };
+
+      // Toggle Sidebar
+      window.toggleSidebar = function() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('sidebar-collapsed');
+      };
+
+      // Init
+      document.addEventListener('DOMContentLoaded', () => {
+        navigateTo('dashboard');
+        lucide.createIcons();
+      });
     </script>
   </body>
 </html>
