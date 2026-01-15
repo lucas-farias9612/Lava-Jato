@@ -13,6 +13,8 @@
       .custom-scrollbar::-webkit-scrollbar { width: 6px; }
       .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
       .custom-scrollbar::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+      .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
     <script type="importmap">
 {
@@ -93,7 +95,7 @@
 
         <!-- DYNAMIC REACT VIEW -->
         <div id="root" class="flex-1 overflow-y-auto p-6 bg-[#f9fafb] custom-scrollbar">
-          <!-- React vai injetar o conteúdo aqui -->
+          <!-- O React injetará o conteúdo aqui -->
         </div>
       </main>
     </div>
@@ -111,11 +113,9 @@
         }
       }
 
-      // Função global para o React ouvir
       window.switchView = function(viewId) {
-        // Atualizar estilos dos botões (UI nativa)
         document.querySelectorAll('.nav-item').forEach(btn => {
-          btn.classList.remove('nav-active', 'text-white');
+          btn.classList.remove('nav-active');
           btn.classList.add('text-gray-500', 'hover:bg-gray-100');
         });
         const activeBtn = document.getElementById('nav-' + viewId);
@@ -123,8 +123,6 @@
           activeBtn.classList.add('nav-active');
           activeBtn.classList.remove('text-gray-500', 'hover:bg-gray-100');
         }
-
-        // Disparar evento para o React
         window.dispatchEvent(new CustomEvent('change-view', { detail: viewId }));
       };
     </script>
