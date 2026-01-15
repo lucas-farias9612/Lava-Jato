@@ -11,11 +11,11 @@ import {
   CircleDollarSign,
   Bell
 } from 'lucide-react';
-import Dashboard from './components/Dashboard';
-import Customers from './components/Customers';
-import Suppliers from './components/Suppliers';
-import Invoices from './components/Invoices';
-import Financial from './components/Financial';
+import Dashboard from './components/Dashboard.tsx';
+import Customers from './components/Customers.tsx';
+import Suppliers from './components/Suppliers.tsx';
+import Invoices from './components/Invoices.tsx';
+import Financial from './components/Financial.tsx';
 
 type View = 'dashboard' | 'customers' | 'suppliers' | 'invoices' | 'financial';
 

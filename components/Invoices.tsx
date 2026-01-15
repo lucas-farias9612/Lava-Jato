@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ExternalLink, Receipt, Plus, Search, CheckCircle2, AlertTriangle, Info } from 'lucide-react';
-import { NFE_URL } from '../constants';
+import { NFE_URL } from '../constants.tsx';
 
 const Invoices: React.FC = () => {
   const handleOpenNfe = () => {
