@@ -1,7 +1,5 @@
 {
-  "name": "Lava Jato Pro - Gestão & NFe",
-  "description": "Sistema completo de gestão para lava jato com controle financeiro e integração com portal NFe de Rio Verde-GO.",
-  "requestFramePermissions": [
-    "camera"
-  ]
+  "name": "Lava Pro Gestão Blue",
+  "description": "Sistema administrativo azul e branco para lava jato com robô NFe Rio Verde.",
+  "requestFramePermissions": []
 }
