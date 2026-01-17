@@ -9,31 +9,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-      body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f0f4f8; margin: 0; overflow: hidden; }
-      .nav-active { background-color: #1e40af !important; color: white !important; box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2); }
+      body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; margin: 0; overflow: hidden; }
+      .nav-active { background-color: #1e40af !important; color: white !important; box-shadow: 0 10px 15px -3px rgba(30, 64, 175, 0.2); }
       .nav-active i { color: white !important; }
       .custom-scrollbar::-webkit-scrollbar { width: 6px; }
       .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
       .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-      .glass-card { background: white; border: 1px solid #e2e8f0; border-radius: 20px; transition: all 0.2s ease; position: relative; }
-      .status-pill { font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 4px 10px; border-radius: 99px; }
+      .glass-card { background: white; border: 1px solid #e2e8f0; border-radius: 24px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+      .glass-card:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.05); }
+      .status-pill { font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 4px 12px; border-radius: 99px; }
       .btn-primary { background: #2563eb; color: white; transition: all 0.2s; }
       .btn-primary:hover { background: #1e40af; transform: translateY(-1px); }
-      .animate-in { animation: fadeIn 0.3s ease-out forwards; }
-      @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-      .btn-delete-staff { 
-        position: absolute; top: 1rem; right: 1rem; 
-        padding: 10px; color: #94a3b8; cursor: pointer; 
-        z-index: 50; transition: all 0.2s;
-        border-radius: 12px;
-      }
-      .btn-delete-staff:hover { color: #ef4444; background: #fee2e2; }
-      .btn-action { padding: 10px; border-radius: 12px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
-      .btn-whatsapp { background: #dcfce7; color: #166534; }
-      .btn-whatsapp:hover { background: #22c55e; color: white; }
-      .btn-cash { background: #eff6ff; color: #1e40af; }
-      .btn-cash:hover { background: #2563eb; color: white; }
+      .animate-in { animation: fadeIn 0.4s ease-out forwards; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
       
+      .metric-card-blue { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white; }
+      .quick-action-btn { transition: all 0.2s; border: 1px solid #e2e8f0; }
+      .quick-action-btn:hover { background-color: #f1f5f9; border-color: #cbd5e1; transform: scale(1.02); }
+
       /* Checklist Visual Styles */
       .icon-selector { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
       .icon-option { border: 2px solid #f1f5f9; border-radius: 12px; padding: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
@@ -41,15 +34,20 @@
       .color-selector { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
       .color-option { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #f1f5f9; cursor: pointer; transition: all 0.2s; position: relative; }
       .color-option.active { border-color: #2563eb; transform: scale(1.1); box-shadow: 0 0 0 2px white, 0 0 0 4px #2563eb; }
-      .color-option.white { background-color: #ffffff; border: 1px solid #e2e8f0; }
+      
+      .btn-action { padding: 10px; border-radius: 12px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+      .btn-whatsapp { background: #dcfce7; color: #166534; }
+      .btn-whatsapp:hover { background: #22c55e; color: white; }
+      .btn-cash { background: #eff6ff; color: #1e40af; }
+      .btn-cash:hover { background: #2563eb; color: white; }
     </style>
   <script type="importmap">
 {
   "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
     "react": "https://esm.sh/react@^19.2.3",
     "recharts": "https://esm.sh/recharts@^3.6.0",
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
-    "react/": "https://esm.sh/react@^19.2.3/"
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0"
   }
 }
 </script>
@@ -62,7 +60,7 @@
     <div class="flex h-screen overflow-hidden">
       <aside class="bg-white border-r border-slate-200 w-64 flex flex-col z-30 shrink-0">
         <div class="p-8 flex items-center gap-3">
-          <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-200">
+          <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
             <i data-lucide="droplet"></i>
           </div>
           <span class="font-extrabold text-xl tracking-tight text-slate-800">LAVA<span class="text-blue-600">PRO</span></span>
@@ -96,7 +94,7 @@
           <div class="flex items-center gap-4 text-xs font-bold text-slate-500">
             <span id="header-date"></span>
             <div class="h-4 w-px bg-slate-200"></div>
-            <span class="text-blue-600 font-extrabold uppercase tracking-tighter">Rio Verde <span class="text-slate-400">v5.3</span></span>
+            <span class="text-blue-600 font-extrabold uppercase tracking-tighter">Rio Verde <span class="text-slate-400">v5.4</span></span>
           </div>
         </header>
         <div id="content" class="flex-1 overflow-y-auto p-8 custom-scrollbar"></div>
@@ -119,7 +117,6 @@
       };
       DB.init();
 
-      // Funções Auxiliares de Checklist
       window.selectIcon = (iconName) => {
         document.querySelectorAll('.icon-option').forEach(opt => opt.classList.remove('active'));
         document.querySelector(`[data-icon="${iconName}"]`).classList.add('active');
@@ -144,8 +141,7 @@
       window.openPaymentModal = (id) => {
         const s = DB.get('services').find(x => String(x.id) === String(id));
         const box = document.getElementById('modal-box');
-        document.getElementById('modal-container').classList.remove('hidden');
-        document.getElementById('modal-container').classList.add('flex');
+        document.getElementById('modal-container').classList.remove('hidden').classList.add('flex');
         box.innerHTML = `
           <div class="p-8 border-b bg-slate-50 flex justify-between items-center">
             <h3 class="font-black text-slate-800 uppercase text-xs tracking-widest">Finalizar Pagamento</h3>
@@ -175,20 +171,124 @@
           const today = new Date().toLocaleDateString('pt-BR');
           const todayServices = services.filter(s => s.entryDate === today);
           const revenue = todayServices.reduce((a, b) => a + (b.paid ? b.value : 0), 0);
+          const pendingCount = services.filter(s => s.status !== 'Entregue').length;
+          const customerCount = DB.get('customers').length;
+
           return `
-            <div class="animate-in space-y-8">
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="glass-card p-6 bg-blue-600 text-white shadow-xl">
-                  <p class="text-[10px] font-black uppercase opacity-60">Faturamento Hoje</p>
-                  <h3 class="text-3xl font-black">R$ ${revenue.toFixed(2)}</h3>
+            <div class="animate-in space-y-8 pb-10">
+              <!-- GREETING -->
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Olá, Administrador 👋</h1>
+                  <p class="text-slate-500 font-medium text-sm">Confira como está o movimento do seu Lava Jato agora.</p>
                 </div>
-                <div class="glass-card p-6 border-l-4 border-l-blue-600">
-                  <p class="text-[10px] font-black text-slate-400 uppercase">Pátio Agora</p>
-                  <h3 class="text-3xl font-black">${services.filter(s => s.status !== 'Entregue').length}</h3>
+                <div class="flex gap-2">
+                   <button onclick="openModal('service')" class="px-5 py-3 btn-primary rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg shadow-blue-100">Nova Entrada</button>
                 </div>
-                <div class="glass-card p-6 border-l-4 border-l-slate-900">
-                  <p class="text-[10px] font-black text-slate-400 uppercase">Portal NFe</p>
-                  <a href="https://servicos.rioverde.go.gov.br/" target="_blank" class="mt-2 flex items-center gap-2 text-sm font-black text-blue-600">Sincronizar Notas <i data-lucide="external-link" class="w-4 h-4"></i></a>
+              </div>
+
+              <!-- METRICS GRID -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="metric-card-blue p-6 rounded-[2rem] shadow-xl shadow-blue-100 flex flex-col justify-between h-40">
+                  <div>
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-4"><i data-lucide="dollar-sign"></i></div>
+                    <p class="text-[10px] font-bold uppercase opacity-60 tracking-widest">Faturamento Hoje</p>
+                  </div>
+                  <h3 class="text-2xl font-black">R$ ${revenue.toFixed(2)}</h3>
+                </div>
+                
+                <div class="glass-card p-6 flex flex-col justify-between h-40">
+                  <div>
+                    <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-4"><i data-lucide="navigation"></i></div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pátio Ativo</p>
+                  </div>
+                  <h3 class="text-2xl font-black text-slate-800">${pendingCount} <span class="text-xs font-bold text-slate-400">veículos</span></h3>
+                </div>
+
+                <div class="glass-card p-6 flex flex-col justify-between h-40">
+                  <div>
+                    <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mb-4"><i data-lucide="users"></i></div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Clientes</p>
+                  </div>
+                  <h3 class="text-2xl font-black text-slate-800">${customerCount} <span class="text-xs font-bold text-slate-400">cadastrados</span></h3>
+                </div>
+
+                <div class="glass-card p-6 flex flex-col justify-between h-40">
+                  <div>
+                    <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mb-4"><i data-lucide="file-text"></i></div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sinc. Rio Verde</p>
+                  </div>
+                  <a href="https://servicos.rioverde.go.gov.br/" target="_blank" class="text-xs font-black text-blue-600 flex items-center gap-1">Acessar NFe <i data-lucide="external-link" class="w-3 h-3"></i></a>
+                </div>
+              </div>
+
+              <!-- MAIN SECTION -->
+              <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- CHART & ACTIONS -->
+                <div class="lg:col-span-2 space-y-6">
+                  <div class="glass-card p-8">
+                    <div class="flex justify-between items-center mb-8">
+                       <h3 class="font-bold text-slate-800 tracking-tight">Fluxo Semanal</h3>
+                       <div class="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase">
+                          <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-600"></span> Receita</span>
+                       </div>
+                    </div>
+                    <!-- Simulação de Gráfico SVG -->
+                    <div class="h-48 w-full flex items-end gap-3 pb-2 border-b border-slate-100">
+                      ${[40, 65, 30, 85, 45, 95, 75].map((h, i) => `
+                        <div class="flex-1 bg-blue-50 group relative cursor-pointer flex flex-col justify-end rounded-t-lg transition-all hover:bg-blue-100" style="height: 100%">
+                           <div class="bg-blue-600 w-full rounded-t-lg transition-all group-hover:bg-blue-700" style="height: ${h}%"></div>
+                           <span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] font-black text-blue-600 opacity-0 group-hover:opacity-100 transition-all">${h*2}</span>
+                        </div>
+                      `).join('')}
+                    </div>
+                    <div class="flex justify-between mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2">
+                       <span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span><span>Dom</span>
+                    </div>
+                  </div>
+
+                  <!-- QUICK ACTIONS -->
+                  <div class="grid grid-cols-3 gap-4">
+                     <button onclick="openModal('customer')" class="quick-action-btn bg-white p-4 rounded-2xl flex items-center gap-3">
+                        <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-600"><i data-lucide="user-plus"></i></div>
+                        <span class="text-[10px] font-black text-slate-800 uppercase tracking-wider">Novo Cliente</span>
+                     </button>
+                     <button onclick="navigateTo('financial')" class="quick-action-btn bg-white p-4 rounded-2xl flex items-center gap-3">
+                        <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-600"><i data-lucide="receipt"></i></div>
+                        <span class="text-[10px] font-black text-slate-800 uppercase tracking-wider">Despesa</span>
+                     </button>
+                     <button onclick="navigateTo('employees')" class="quick-action-btn bg-white p-4 rounded-2xl flex items-center gap-3">
+                        <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-600"><i data-lucide="users"></i></div>
+                        <span class="text-[10px] font-black text-slate-800 uppercase tracking-wider">Equipe</span>
+                     </button>
+                  </div>
+                </div>
+
+                <!-- RECENT SERVICES -->
+                <div class="lg:col-span-1 glass-card overflow-hidden flex flex-col">
+                   <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                      <h3 class="font-black text-slate-800 uppercase text-[10px] tracking-widest">Últimas Atividades</h3>
+                      <button onclick="navigateTo('patio')" class="text-[9px] font-black text-blue-600 uppercase">Ver Tudo</button>
+                   </div>
+                   <div class="flex-1 overflow-y-auto custom-scrollbar divide-y divide-slate-100">
+                      ${todayServices.length > 0 ? todayServices.slice(0, 8).map(s => `
+                        <div class="p-4 flex items-center gap-4 hover:bg-slate-50 transition-colors">
+                           <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm" style="background-color: ${s.vehicleColor || '#2563eb'}">
+                              <i data-lucide="${s.vehicleIcon || 'car'}" class="w-5 h-5"></i>
+                           </div>
+                           <div class="flex-1 min-w-0">
+                              <p class="text-sm font-black text-slate-800 truncate">${s.car.toUpperCase()}</p>
+                              <p class="text-[10px] font-bold text-slate-400 uppercase">${s.type} • ${s.entryTime}</p>
+                           </div>
+                           <span class="status-pill ${s.paid ? 'bg-emerald-100 text-emerald-600' : 'bg-blue-100 text-blue-600'}">${s.paid ? 'Pago' : 'Pátio'}</span>
+                        </div>
+                      `).join('') : `
+                        <div class="flex-1 flex flex-col items-center justify-center p-12 text-center opacity-30">
+                           <i data-lucide="coffee" class="w-12 h-12 mb-4"></i>
+                           <p class="text-[10px] font-black uppercase tracking-widest">Tudo tranquilo por aqui</p>
+                        </div>
+                      `}
+                   </div>
                 </div>
               </div>
             </div>
@@ -199,8 +299,8 @@
           return `
             <div class="animate-in space-y-6">
               <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-black text-slate-800 uppercase">Pátio Ativo</h1>
-                <button onclick="openModal('service')" class="px-6 py-4 btn-primary rounded-xl font-black text-[10px] uppercase shadow-lg">Nova Entrada</button>
+                <h1 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Pátio Ativo</h1>
+                <button onclick="openModal('service')" class="px-6 py-4 btn-primary rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-200">Nova Entrada</button>
               </div>
               <div class="grid grid-cols-1 gap-4">
                 ${services.map(s => `
@@ -214,18 +314,25 @@
                       </div>
                       <div>
                         <h4 class="font-black text-slate-800 uppercase text-lg">${s.car} <span class="text-slate-400 font-bold">(${s.plate})</span></h4>
-                        <p class="text-[10px] font-bold text-blue-500 uppercase">${s.type} • R$ ${s.value.toFixed(2)}</p>
+                        <p class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">${s.type} • R$ ${s.value.toFixed(2)}</p>
                       </div>
                     </div>
+                    
                     <div class="flex items-center gap-3 mt-4 md:mt-0">
-                      <select onchange="updateService('${s.id}', 'status', this.value)" class="bg-slate-50 border border-slate-200 p-3 rounded-xl text-[10px] font-black uppercase outline-none focus:ring-2 focus:ring-blue-100">
-                        <option value="Aguardando" ${s.status === 'Aguardando' ? 'selected' : ''}>Aguardando</option>
-                        <option value="Em Lavagem" ${s.status === 'Em Lavagem' ? 'selected' : ''}>Em Lavagem</option>
-                        <option value="Pronto" ${s.status === 'Pronto' ? 'selected' : ''}>Pronto</option>
-                        <option value="Entregue">Finalizar</option>
-                      </select>
-                      <button onclick="notifyWhatsApp('${s.id}')" class="btn-action btn-whatsapp"><i data-lucide="message-circle"></i></button>
-                      <button onclick="openPaymentModal('${s.id}')" class="btn-action btn-cash"><i data-lucide="dollar-sign"></i></button>
+                      <div class="flex flex-col gap-1">
+                        <label class="text-[9px] font-black text-slate-400 uppercase ml-1">Status</label>
+                        <select onchange="updateService('${s.id}', 'status', this.value)" class="bg-slate-50 border border-slate-200 p-3 rounded-xl text-[10px] font-black uppercase outline-none focus:ring-2 focus:ring-blue-100 min-w-[150px]">
+                          <option value="Aguardando" ${s.status === 'Aguardando' ? 'selected' : ''}>Aguardando</option>
+                          <option value="Em Lavagem" ${s.status === 'Em Lavagem' ? 'selected' : ''}>Em Lavagem</option>
+                          <option value="Pronto" ${s.status === 'Pronto' ? 'selected' : ''}>Pronto</option>
+                          <option value="Entregue">Finalizar</option>
+                        </select>
+                      </div>
+
+                      <div class="flex items-center gap-2 mt-4">
+                        <button onclick="notifyWhatsApp('${s.id}')" class="btn-action btn-whatsapp" title="WhatsApp"><i data-lucide="message-circle"></i></button>
+                        <button onclick="openPaymentModal('${s.id}')" class="btn-action btn-cash" title="Pagamento"><i data-lucide="dollar-sign"></i></button>
+                      </div>
                     </div>
                   </div>
                 `).join('') || '<div class="glass-card p-20 text-center text-slate-300 font-black uppercase text-[10px]">Pátio Vazio</div>'}
@@ -238,56 +345,94 @@
           return `
             <div class="animate-in space-y-6">
               <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-black text-slate-800 uppercase">Clientes</h1>
-                <button onclick="openModal('customer')" class="px-6 py-4 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase">Novo Cliente</button>
+                <h1 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Cadastro de Clientes</h1>
+                <button onclick="openModal('customer')" class="px-6 py-4 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest">Novo Cliente</button>
               </div>
               <div class="glass-card overflow-hidden">
                 <table class="w-full text-left">
                   <thead class="bg-slate-50 border-b text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    <tr><th class="px-8 py-4">Veículo</th><th class="px-8 py-4">Cliente</th><th class="px-8 py-4 text-right">Fidelidade</th></tr>
+                    <tr><th class="px-8 py-4">Veículo / Placa</th><th class="px-8 py-4">Nome do Cliente</th><th class="px-8 py-4 text-right">Fidelidade</th></tr>
                   </thead>
                   <tbody>
                     ${custs.map(c => `
-                      <tr class="border-b hover:bg-slate-50 transition-colors">
+                      <tr class="border-b hover:bg-slate-50 transition-all">
                         <td class="px-8 py-4">
                           <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400" style="background-color: ${c.vehicleColor}20">
-                              <i data-lucide="${c.vehicleIcon || 'car'}" class="w-5 h-5" style="color: ${c.vehicleColor}"></i>
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background-color: ${c.vehicleColor}20">
+                              <i data-lucide="${c.vehicleIcon || 'car'}" class="w-4 h-4" style="color: ${c.vehicleColor}"></i>
                             </div>
-                            <span class="font-black text-slate-800 text-xs">${c.plate}</span>
+                            <span class="font-black text-slate-800 text-xs">${c.plate.toUpperCase()}</span>
                           </div>
                         </td>
-                        <td class="px-8 py-4 text-sm font-bold text-slate-600">${c.name}</td>
+                        <td class="px-8 py-4 font-bold text-slate-500">${c.name}</td>
                         <td class="px-8 py-4 text-right"><span class="status-pill bg-blue-100 text-blue-600">${c.washes || 0}/10</span></td>
                       </tr>
-                    `).join('') || '<tr><td colspan="3" class="p-20 text-center text-slate-300">Sem clientes</td></tr>'}
+                    `).join('') || '<tr><td colspan="3" class="p-20 text-center text-slate-300 font-black uppercase text-[10px]">Sem clientes cadastrados</td></tr>'}
                   </tbody>
                 </table>
               </div>
             </div>
           `;
         },
-        financial: () => ``, // Omitido para brevidade, funcionalidade mantida no script
-        employees: () => ``  // Omitido para brevidade, funcionalidade mantida no script
+        financial: () => {
+          const services = DB.get('services').filter(s => s.paid);
+          const totalIn = services.reduce((a, b) => a + b.value, 0);
+          return `
+            <div class="animate-in space-y-8">
+              <h1 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Fluxo Financeiro</h1>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-card p-8 bg-emerald-600 text-white shadow-xl">
+                  <p class="text-[10px] font-black uppercase opacity-60">Faturamento Realizado</p>
+                  <h3 class="text-4xl font-black mt-2">R$ ${totalIn.toFixed(2)}</h3>
+                </div>
+                <div class="glass-card p-8 bg-slate-900 text-white shadow-xl flex flex-col justify-between">
+                  <p class="text-[10px] font-black uppercase opacity-60 tracking-widest">Sincronização Rio Verde</p>
+                  <button onclick="window.open('https://servicos.rioverde.go.gov.br/', '_blank')" class="mt-4 px-6 py-4 bg-white/10 hover:bg-white/20 rounded-xl font-black text-[10px] uppercase tracking-widest w-full">Abrir Portal NFe</button>
+                </div>
+              </div>
+            </div>
+          `;
+        },
+        employees: () => {
+          const emps = DB.get('employees');
+          return `
+            <div class="animate-in space-y-6">
+              <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Equipe</h1>
+                <button onclick="openModal('employee')" class="px-6 py-4 bg-blue-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest">Cadastrar</button>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                ${emps.map(e => `
+                  <div class="glass-card p-6 border-t-4 border-t-blue-600">
+                    <div class="flex items-center gap-4 mb-4">
+                      <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center font-black">${e.name[0]}</div>
+                      <div>
+                        <h4 class="font-black text-slate-800 uppercase text-sm">${e.name}</h4>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">${e.role}</p>
+                      </div>
+                    </div>
+                    <p class="text-xs font-black text-slate-700">Salário: R$ ${parseFloat(e.salary).toFixed(2)}</p>
+                  </div>
+                `).join('') || '<div class="col-span-full glass-card p-20 text-center text-slate-300">Nenhum funcionário cadastrado</div>'}
+              </div>
+            </div>
+          `;
+        }
       };
 
       window.navigateTo = (viewId) => {
         document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('nav-active'));
         const nav = document.getElementById(`nav-${viewId}`);
         if(nav) nav.classList.add('nav-active');
-        const viewFn = views[viewId];
-        if(viewFn) {
-            document.getElementById('view-title').innerText = viewId.toUpperCase();
-            document.getElementById('content').innerHTML = viewFn();
-            lucide.createIcons();
-        }
+        document.getElementById('view-title').innerText = viewId.toUpperCase();
+        document.getElementById('content').innerHTML = views[viewId]();
+        lucide.createIcons();
       };
 
       window.openModal = (type) => {
         const modal = document.getElementById('modal-container');
         const box = document.getElementById('modal-box');
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
+        modal.classList.remove('hidden').classList.add('flex');
         box.innerHTML = '';
 
         if(type === 'customer') {
@@ -298,12 +443,12 @@
             </div>
             <form id="f-customer" class="p-8 space-y-6">
               <div class="grid grid-cols-2 gap-4">
-                <input name="name" required placeholder="Nome do Cliente" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none">
-                <input name="phone" required placeholder="WhatsApp" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none">
+                <input name="name" required placeholder="Nome do Cliente" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none border border-transparent focus:border-blue-200">
+                <input name="phone" required placeholder="WhatsApp (DDD + N)" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none border border-transparent focus:border-blue-200">
               </div>
               <div class="grid grid-cols-2 gap-4">
-                <input name="model" required placeholder="Modelo (Ex: Hilux)" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none uppercase">
-                <input name="plate" required placeholder="Placa" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none uppercase">
+                <input name="model" required placeholder="Modelo (Ex: Hilux)" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none uppercase border border-transparent focus:border-blue-200">
+                <input name="plate" required placeholder="Placa" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none uppercase border border-transparent focus:border-blue-200">
               </div>
               
               <div class="space-y-3">
@@ -323,7 +468,7 @@
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Cor do Veículo</label>
                 <input type="hidden" name="vehicleColor" id="selected-color" value="#ffffff">
                 <div class="color-selector">
-                  <div class="color-option white active" data-color="#ffffff" onclick="selectColor('#ffffff')" style="background: #ffffff"></div>
+                  <div class="color-option active" data-color="#ffffff" onclick="selectColor('#ffffff')" style="background: #ffffff; border: 1px solid #e2e8f0"></div>
                   <div class="color-option" data-color="#facc15" onclick="selectColor('#facc15')" style="background: #facc15"></div>
                   <div class="color-option" data-color="#94a3b8" onclick="selectColor('#94a3b8')" style="background: #94a3b8"></div>
                   <div class="color-option" data-color="#0f172a" onclick="selectColor('#0f172a')" style="background: #0f172a"></div>
@@ -341,8 +486,8 @@
               </div>
 
               <div class="flex gap-3">
-                 <button type="submit" class="flex-1 py-5 bg-emerald-600 text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-xl">Salvar</button>
-                 <button type="button" onclick="closeModal()" class="px-8 py-5 bg-slate-100 text-slate-500 rounded-xl font-black text-xs uppercase tracking-widest">Fechar</button>
+                 <button type="submit" class="flex-1 py-5 bg-emerald-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-100">Salvar Cliente</button>
+                 <button type="button" onclick="closeModal()" class="px-8 py-5 bg-slate-100 text-slate-500 rounded-2xl font-black text-xs uppercase tracking-widest">Cancelar</button>
               </div>
             </form>
           `;
@@ -350,24 +495,37 @@
           const custs = DB.get('customers');
           box.innerHTML = `
             <div class="p-8 border-b bg-slate-50 flex justify-between items-center">
-              <h3 class="font-black text-slate-800 uppercase text-xs tracking-widest">Entrada de Veículo</h3>
+              <h3 class="font-black text-slate-800 uppercase text-xs tracking-widest">Nova Entrada</h3>
               <button onclick="closeModal()" class="text-slate-400"><i data-lucide="x"></i></button>
             </div>
             <form id="f-service" class="p-8 space-y-4">
-              <select name="customerId" required class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none">
+              <select name="customerId" required class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none border border-transparent focus:border-blue-200">
                 <option value="">Selecione o Cliente</option>
-                ${custs.map(c => `<option value="${c.id}">${c.name} (${c.plate})</option>`).join('')}
+                ${custs.map(c => `<option value="${c.id}">${c.name} (${c.plate.toUpperCase()})</option>`).join('')}
               </select>
-              <input name="type" required placeholder="Tipo de Serviço" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none">
-              <input name="value" required type="number" placeholder="Valor" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none">
-              <button type="submit" class="w-full py-5 bg-blue-600 text-white rounded-xl font-black text-xs uppercase shadow-xl">Entrar no Pátio</button>
+              <input name="type" required placeholder="Tipo de Serviço (Ex: Ducha, Lavagem Completa)" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none border border-transparent focus:border-blue-200">
+              <input name="value" required type="number" placeholder="Valor Cobrado (R$)" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none border border-transparent focus:border-blue-200">
+              <button type="submit" class="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-100">Iniciar Serviço</button>
+            </form>
+          `;
+        } else if(type === 'employee') {
+          box.innerHTML = `
+            <div class="p-8 border-b bg-slate-50 flex justify-between items-center">
+              <h3 class="font-black text-slate-800 uppercase text-xs tracking-widest">Novo Funcionário</h3>
+              <button onclick="closeModal()" class="text-slate-400"><i data-lucide="x"></i></button>
+            </div>
+            <form id="f-employee" class="p-8 space-y-4">
+              <input name="name" required placeholder="Nome Completo" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none border border-transparent focus:border-blue-200">
+              <input name="role" required placeholder="Cargo" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none border border-transparent focus:border-blue-200">
+              <input name="salary" required type="number" placeholder="Salário Base" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none border border-transparent focus:border-blue-200">
+              <button type="submit" class="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-100">Cadastrar Profissional</button>
             </form>
           `;
         }
         lucide.createIcons();
       };
 
-      window.closeModal = () => document.getElementById('modal-container').classList.add('hidden');
+      window.closeModal = () => document.getElementById('modal-container').classList.add('hidden').classList.remove('flex');
 
       window.updateService = (id, field, value) => {
         const services = DB.get('services');
@@ -394,6 +552,11 @@
           list.push({ id: Date.now(), ...data, washes: 0 });
           DB.save('customers', list);
           window.navigateTo('customers');
+        } else if(e.target.id === 'f-employee') {
+          const list = DB.get('employees');
+          list.push({ id: Date.now(), ...data });
+          DB.save('employees', list);
+          window.navigateTo('employees');
         } else if(e.target.id === 'f-service') {
           const list = DB.get('services');
           const cust = DB.get('customers').find(c => String(c.id) === String(data.customerId));
@@ -418,7 +581,7 @@
             const cIdx = customers.findIndex(c => String(c.id) === String(services[idx].customerId));
             if(cIdx !== -1) { customers[cIdx].washes = (customers[cIdx].washes || 0) + 1; DB.save('customers', customers); }
             DB.save('services', services);
-            window.navigateTo('patio');
+            window.navigateTo('dashboard');
           }
         }
         window.closeModal();
