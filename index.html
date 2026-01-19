@@ -29,7 +29,7 @@
 
       /* Checklist Visual Styles */
       .icon-selector { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
-      .icon-option { border: 2px solid #f1f5f9; border-radius: 12px; padding: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+      .icon-option { border: 2px solid #f1f5f9; border-radius: 12px; padding: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; color: #64748b; }
       .icon-option.active { border-color: #2563eb; background: #eff6ff; color: #2563eb; }
       .color-selector { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
       .color-option { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #f1f5f9; cursor: pointer; transition: all 0.2s; position: relative; }
@@ -41,23 +41,25 @@
       .btn-cash { background: #eff6ff; color: #1e40af; }
       .btn-cash:hover { background: #2563eb; color: white; transform: scale(1.05); }
       
-      .input-premium { width: 100%; padding: 16px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; font-weight: 700; outline: none; transition: all 0.2s; }
+      .input-premium { width: 100%; padding: 16px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; font-weight: 700; outline: none; transition: all 0.2s; color: #1e293b; }
       .input-premium:focus { border-color: #2563eb; background-color: white; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.05); }
+      ::placeholder { color: #94a3b8; font-weight: 500; }
     </style>
   <script type="importmap">
 {
   "imports": {
-    "react/": "https://esm.sh/react@^19.2.3/",
     "react": "https://esm.sh/react@^19.2.3",
     "recharts": "https://esm.sh/recharts@^3.6.0",
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0"
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react/": "https://esm.sh/react@^19.2.3/"
   }
 }
 </script>
 </head>
   <body>
+    <!-- Modal Container -->
     <div id="modal-container" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-      <div id="modal-box" class="bg-white w-full max-w-2xl rounded-[2rem] shadow-2xl overflow-hidden animate-in border border-slate-100 max-h-[90vh] overflow-y-auto custom-scrollbar"></div>
+      <div id="modal-box" class="bg-white w-full max-w-2xl rounded-[2rem] shadow-2xl overflow-hidden animate-in border border-slate-100 max-h-[90vh] overflow-y-auto custom-scrollbar relative z-[110]"></div>
     </div>
 
     <div class="flex h-screen overflow-hidden">
@@ -97,7 +99,7 @@
           <div class="flex items-center gap-4 text-xs font-bold text-slate-500">
             <span id="header-date"></span>
             <div class="h-4 w-px bg-slate-200"></div>
-            <span class="text-blue-600 font-extrabold uppercase tracking-tighter">Rio Verde <span class="text-slate-400">v5.5</span></span>
+            <span class="text-blue-600 font-extrabold uppercase tracking-tighter">Rio Verde <span class="text-slate-400">v5.6</span></span>
           </div>
         </header>
         <div id="content" class="flex-1 overflow-y-auto p-8 custom-scrollbar"></div>
@@ -120,16 +122,27 @@
       };
       DB.init();
 
+      // UI Helpers
       window.selectIcon = (iconName) => {
         document.querySelectorAll('.icon-option').forEach(opt => opt.classList.remove('active'));
-        document.querySelector(`[data-icon="${iconName}"]`).classList.add('active');
-        document.getElementById('selected-icon').value = iconName;
+        const target = document.querySelector(`[data-icon="${iconName}"]`);
+        if (target) target.classList.add('active');
+        const input = document.getElementById('selected-icon');
+        if (input) input.value = iconName;
       };
 
       window.selectColor = (colorHex) => {
         document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('active'));
-        document.querySelector(`[data-color="${colorHex}"]`).classList.add('active');
-        document.getElementById('selected-color').value = colorHex;
+        const target = document.querySelector(`[data-color="${colorHex}"]`);
+        if (target) target.classList.add('active');
+        const input = document.getElementById('selected-color');
+        if (input) input.value = colorHex;
+      };
+
+      window.closeModal = () => {
+        const modal = document.getElementById('modal-container');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
       };
 
       window.notifyWhatsApp = (id) => {
@@ -144,13 +157,17 @@
       window.openPaymentModal = (id) => {
         const s = DB.get('services').find(x => String(x.id) === String(id));
         const box = document.getElementById('modal-box');
-        document.getElementById('modal-container').classList.remove('hidden').classList.add('flex');
+        const modal = document.getElementById('modal-container');
+        
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        
         box.innerHTML = `
           <div class="p-8 border-b bg-slate-50 flex justify-between items-center">
             <h3 class="font-black text-slate-800 uppercase text-xs tracking-widest">Finalizar Pagamento</h3>
-            <button onclick="closeModal()" class="text-slate-400"><i data-lucide="x"></i></button>
+            <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x"></i></button>
           </div>
-          <form id="f-payment" data-id="${id}" class="p-8 space-y-4">
+          <form id="f-payment" data-id="${id}" class="p-8 space-y-6">
             <div class="bg-blue-600 p-8 rounded-[2rem] text-center text-white shadow-xl mb-6">
               <p class="text-[10px] font-black uppercase opacity-60 mb-1 tracking-widest">Valor do Serviço</p>
               <p class="text-4xl font-black">R$ ${s.value.toFixed(2)}</p>
@@ -158,7 +175,7 @@
             </div>
             <div class="space-y-2">
               <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Forma de Pagamento</label>
-              <select name="method" required class="input-premium appearance-none">
+              <select name="method" required class="input-premium appearance-none cursor-pointer">
                 <option value="dinheiro">💵 Dinheiro</option>
                 <option value="pix">💎 PIX</option>
                 <option value="cartao_debito">💳 Cartão de Débito</option>
@@ -286,18 +303,16 @@
 
           return `
             <div class="animate-in space-y-8 pb-10">
-              <!-- HEADER -->
               <div class="flex justify-between items-end">
                 <div>
                   <h1 class="text-3xl font-black text-slate-900 tracking-tight uppercase">Pátio Ativo</h1>
                   <p class="text-slate-500 font-bold text-sm">Controle de fluxo em tempo real</p>
                 </div>
-                <button onclick="openModal('service')" class="px-8 py-5 btn-primary rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-2xl shadow-blue-200">
-                  <div class="flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> Nova Entrada</div>
+                <button onclick="openModal('service')" class="px-8 py-5 btn-primary rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-2xl shadow-blue-200 flex items-center gap-2">
+                  <i data-lucide="plus" class="w-4 h-4"></i> Nova Entrada
                 </button>
               </div>
 
-              <!-- PATIO METRICS -->
               <div class="grid grid-cols-3 gap-6">
                 <div class="glass-card p-6 flex items-center gap-4 border-l-4 border-l-amber-400 bg-amber-50/10">
                   <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center"><i data-lucide="clock"></i></div>
@@ -313,12 +328,11 @@
                 </div>
               </div>
 
-              <!-- VEHICLES GRID -->
               <div class="grid grid-cols-1 gap-5">
                 ${services.map(s => `
                   <div class="glass-card p-8 flex flex-col lg:flex-row justify-between items-center gap-6 border-l-[10px] ${s.status === 'Pronto' ? 'border-l-emerald-500 bg-emerald-50/20' : (s.status === 'Em Lavagem' ? 'border-l-blue-500' : 'border-l-amber-400')}">
                     <div class="flex items-center gap-8 flex-1">
-                      <div class="relative group">
+                      <div class="relative">
                         <div class="w-20 h-20 bg-slate-50 border border-slate-100 rounded-[2rem] flex items-center justify-center text-slate-400 shadow-sm">
                           <i data-lucide="${s.vehicleIcon || 'car'}" class="w-10 h-10" style="color: ${s.vehicleColor || '#2563eb'}"></i>
                         </div>
@@ -338,15 +352,13 @@
                     </div>
 
                     <div class="flex items-center gap-12 shrink-0">
-                      <!-- TIME INFO -->
                       <div class="text-right hidden sm:block">
                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Entrada</p>
                         <p class="text-lg font-black text-slate-800">${s.entryTime}</p>
                       </div>
 
-                      <!-- STATUS SELECT -->
                       <div class="flex flex-col gap-2 min-w-[180px]">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Atualizar Status</label>
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Status</label>
                         <select onchange="updateService('${s.id}', 'status', this.value)" class="input-premium py-3 text-[11px] uppercase cursor-pointer">
                           <option value="Aguardando" ${s.status === 'Aguardando' ? 'selected' : ''}>⏳ Aguardando</option>
                           <option value="Em Lavagem" ${s.status === 'Em Lavagem' ? 'selected' : ''}>🫧 Em Lavagem</option>
@@ -355,7 +367,6 @@
                         </select>
                       </div>
 
-                      <!-- ACTIONS -->
                       <div class="flex items-center gap-3">
                         <button onclick="notifyWhatsApp('${s.id}')" class="btn-action btn-whatsapp shadow-lg shadow-emerald-100" title="Avisar WhatsApp">
                           <i data-lucide="message-circle" class="w-6 h-6"></i>
@@ -368,9 +379,8 @@
                   </div>
                 `).join('') || `
                   <div class="glass-card p-32 flex flex-col items-center justify-center text-center opacity-30">
-                    <i data-lucide="layout-grid" class="w-20 h-20 mb-6"></i>
+                    <i data-lucide="layout-grid" class="w-20 h-20 mb-6 text-slate-300"></i>
                     <p class="text-xl font-black uppercase tracking-widest text-slate-400">Pátio Vazio</p>
-                    <p class="text-sm font-bold text-slate-400 mt-2">Nenhum veículo aguardando no momento.</p>
                   </div>
                 `}
               </div>
@@ -382,13 +392,13 @@
           return `
             <div class="animate-in space-y-6">
               <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Cadastro de Clientes</h1>
+                <h1 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Clientes</h1>
                 <button onclick="openModal('customer')" class="px-6 py-4 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest">Novo Cliente</button>
               </div>
               <div class="glass-card overflow-hidden">
                 <table class="w-full text-left">
                   <thead class="bg-slate-50 border-b text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    <tr><th class="px-8 py-4">Veículo / Placa</th><th class="px-8 py-4">Nome do Cliente</th><th class="px-8 py-4 text-right">Fidelidade</th></tr>
+                    <tr><th class="px-8 py-4">Veículo / Placa</th><th class="px-8 py-4">Nome</th><th class="px-8 py-4 text-right">Fidelidade</th></tr>
                   </thead>
                   <tbody>
                     ${custs.map(c => `
@@ -416,15 +426,15 @@
           const totalIn = services.reduce((a, b) => a + b.value, 0);
           return `
             <div class="animate-in space-y-8">
-              <h1 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Fluxo Financeiro</h1>
+              <h1 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Financeiro</h1>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="glass-card p-8 bg-emerald-600 text-white shadow-xl">
-                  <p class="text-[10px] font-black uppercase opacity-60">Faturamento Realizado</p>
+                  <p class="text-[10px] font-black uppercase opacity-60 tracking-widest">Faturamento Total</p>
                   <h3 class="text-4xl font-black mt-2">R$ ${totalIn.toFixed(2)}</h3>
                 </div>
                 <div class="glass-card p-8 bg-slate-900 text-white shadow-xl flex flex-col justify-between">
-                  <p class="text-[10px] font-black uppercase opacity-60 tracking-widest">Sincronização Rio Verde</p>
-                  <button onclick="window.open('https://servicos.rioverde.go.gov.br/', '_blank')" class="mt-4 px-6 py-4 bg-white/10 hover:bg-white/20 rounded-xl font-black text-[10px] uppercase tracking-widest w-full">Abrir Portal NFe</button>
+                  <p class="text-[10px] font-black uppercase opacity-60 tracking-widest text-slate-400">Portal NFe Rio Verde</p>
+                  <a href="https://servicos.rioverde.go.gov.br/" target="_blank" class="mt-4 px-6 py-4 bg-white/10 hover:bg-white/20 rounded-xl font-black text-[10px] uppercase tracking-widest text-center block">Sincronizar Notas</a>
                 </div>
               </div>
             </div>
@@ -435,14 +445,14 @@
           return `
             <div class="animate-in space-y-6">
               <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Equipe</h1>
+                <h1 class="text-2xl font-black text-slate-800 uppercase tracking-tight text-slate-800 uppercase tracking-tight">Equipe</h1>
                 <button onclick="openModal('employee')" class="px-6 py-4 bg-blue-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest">Cadastrar</button>
               </div>
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 ${emps.map(e => `
                   <div class="glass-card p-6 border-t-4 border-t-blue-600">
                     <div class="flex items-center gap-4 mb-4">
-                      <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center font-black">${e.name[0]}</div>
+                      <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center font-black">${e.name[0].toUpperCase()}</div>
                       <div>
                         <h4 class="font-black text-slate-800 uppercase text-sm">${e.name}</h4>
                         <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">${e.role}</p>
@@ -469,14 +479,17 @@
       window.openModal = (type) => {
         const modal = document.getElementById('modal-container');
         const box = document.getElementById('modal-box');
-        modal.classList.remove('hidden').classList.add('flex');
+        
+        // CORREÇÃO DO ERRO DE EXECUÇÃO
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
         box.innerHTML = '';
 
         if(type === 'customer') {
           box.innerHTML = `
             <div class="p-8 border-b bg-slate-50 flex justify-between items-center">
               <h3 class="font-black text-slate-800 uppercase text-xs tracking-widest">Novo Cliente & Veículo</h3>
-              <button onclick="closeModal()" class="text-slate-400"><i data-lucide="x"></i></button>
+              <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x"></i></button>
             </div>
             <form id="f-customer" class="p-8 space-y-6">
               <div class="grid grid-cols-2 gap-4">
@@ -489,7 +502,7 @@
               </div>
               
               <div class="space-y-3">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Figura do Veículo</label>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tipo de Veículo</label>
                 <input type="hidden" name="vehicleIcon" id="selected-icon" value="car">
                 <div class="icon-selector">
                   <div class="icon-option active" data-icon="car" onclick="selectIcon('car')"><i data-lucide="car"></i></div>
@@ -502,7 +515,7 @@
               </div>
 
               <div class="space-y-3">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Cor do Veículo</label>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Cor do Veículo</label>
                 <input type="hidden" name="vehicleColor" id="selected-color" value="#ffffff">
                 <div class="color-selector">
                   <div class="color-option active" data-color="#ffffff" onclick="selectColor('#ffffff')" style="background: #ffffff; border: 1px solid #e2e8f0"></div>
@@ -522,8 +535,8 @@
                 </div>
               </div>
 
-              <div class="flex gap-3">
-                 <button type="submit" class="flex-1 py-5 bg-emerald-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-100">Salvar Cliente</button>
+              <div class="flex gap-3 mt-8">
+                 <button type="submit" class="flex-1 py-5 bg-emerald-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:bg-emerald-700">Salvar Cadastro</button>
                  <button type="button" onclick="closeModal()" class="px-8 py-5 bg-slate-100 text-slate-500 rounded-2xl font-black text-xs uppercase tracking-widest">Cancelar</button>
               </div>
             </form>
@@ -532,28 +545,29 @@
           const custs = DB.get('customers');
           box.innerHTML = `
             <div class="p-8 border-b bg-slate-50 flex justify-between items-center">
-              <h3 class="font-black text-slate-800 uppercase text-xs tracking-widest">Entrada no Pátio</h3>
-              <button onclick="closeModal()" class="text-slate-400"><i data-lucide="x"></i></button>
+              <h3 class="font-black text-slate-800 uppercase text-xs tracking-widest">Nova Entrada no Pátio</h3>
+              <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x"></i></button>
             </div>
             <form id="f-service" class="p-8 space-y-6">
               <div class="space-y-2">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Buscar Cliente</label>
-                <select name="customerId" required class="input-premium appearance-none">
-                  <option value="">Selecione pelo Nome ou Placa</option>
-                  ${custs.map(c => `<option value="${c.id}">${c.name} (${c.plate.toUpperCase()})</option>`).join('')}
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Selecionar Cliente</label>
+                <select name="customerId" required class="input-premium appearance-none cursor-pointer">
+                  <option value="">-- Escolha o Cliente --</option>
+                  ${custs.map(c => `<option value="${c.id}">${c.name.toUpperCase()} (${c.plate.toUpperCase()})</option>`).join('')}
                 </select>
+                ${custs.length === 0 ? '<p class="text-[10px] text-red-500 font-bold mt-1 uppercase">Cadastre um cliente primeiro!</p>' : ''}
               </div>
-              <div class="grid grid-cols-1 gap-4">
+              <div class="grid grid-cols-1 gap-6">
                 <div class="space-y-2">
-                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Serviço a Realizar</label>
+                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Serviço</label>
                   <input name="type" required placeholder="Ex: Lavagem Americana, Higienização..." class="input-premium">
                 </div>
                 <div class="space-y-2">
-                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Preço (R$)</label>
-                  <input name="value" required type="number" placeholder="Valor Cobrado" class="input-premium">
+                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Valor (R$)</label>
+                  <input name="value" required type="number" step="0.01" placeholder="Ex: 50.00" class="input-premium">
                 </div>
               </div>
-              <button type="submit" class="w-full py-6 bg-blue-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-2xl shadow-blue-200 mt-4 transition-all hover:bg-blue-700">
+              <button type="submit" class="w-full py-6 bg-blue-600 text-white rounded-[1.5rem] font-black text-sm uppercase tracking-widest shadow-2xl shadow-blue-200 mt-6 transition-all hover:bg-blue-700">
                 🚀 Iniciar Serviço Agora
               </button>
             </form>
@@ -561,21 +575,19 @@
         } else if(type === 'employee') {
           box.innerHTML = `
             <div class="p-8 border-b bg-slate-50 flex justify-between items-center">
-              <h3 class="font-black text-slate-800 uppercase text-xs tracking-widest">Novo Funcionário</h3>
-              <button onclick="closeModal()" class="text-slate-400"><i data-lucide="x"></i></button>
+              <h3 class="font-black text-slate-800 uppercase text-xs tracking-widest">Cadastrar Equipe</h3>
+              <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x"></i></button>
             </div>
             <form id="f-employee" class="p-8 space-y-4">
               <input name="name" required placeholder="Nome Completo" class="input-premium">
               <input name="role" required placeholder="Cargo" class="input-premium">
               <input name="salary" required type="number" placeholder="Salário Base" class="input-premium">
-              <button type="submit" class="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-100">Cadastrar Profissional</button>
+              <button type="submit" class="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl">Cadastrar</button>
             </form>
           `;
         }
         lucide.createIcons();
       };
-
-      window.closeModal = () => document.getElementById('modal-container').classList.add('hidden').classList.remove('flex');
 
       window.updateService = (id, field, value) => {
         const services = DB.get('services');
