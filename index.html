@@ -4,7 +4,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Lava Pro - Gestão Inteligente</title>
+    <title>Lava Pro - Gestão com WhatsApp</title>
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232563eb'><path d='M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z'/></svg>">
     
@@ -12,49 +12,35 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-      :root { --primary: #2563eb; --success: #10b981; --whatsapp: #25d366; --bg: #f8fafc; }
+      :root { --primary: #2563eb; --success: #10b981; --danger: #ef4444; --whatsapp: #25d366; --bg: #f8fafc; }
       body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); margin: 0; overflow: hidden; -webkit-tap-highlight-color: transparent; }
       
-      .sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
       .nav-item { transition: all 0.2s; position: relative; }
       .nav-active { background-color: var(--primary) !important; color: white !important; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.25); }
       .nav-active i { color: white !important; }
 
-      .glass-card { background: white; border: 1px solid #e2e8f0; border-radius: 24px; transition: transform 0.2s, box-shadow 0.2s; }
-      @media (hover: hover) { .glass-card:hover { transform: translateY(-2px); box-shadow: 0 12px 20px -5px rgba(0,0,0,0.05); } }
+      .glass-card { background: white; border: 1px solid #e2e8f0; border-radius: 24px; transition: all 0.2s; }
       
       .btn-action { border-radius: 16px; font-weight: 800; transition: all 0.2s; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border: none; outline: none; }
       .btn-action:active { transform: scale(0.96); }
       .btn-blue { background: var(--primary); color: white; }
       .btn-green { background: var(--success); color: white; }
       .btn-whatsapp { background: var(--whatsapp); color: white; }
-      .btn-slate { background: #0f172a; color: white; }
+      .btn-red { background: var(--danger); color: white; }
 
-      .input-premium { width: 100%; padding: 14px 18px; background-color: #f1f5f9; border: 1.5px solid transparent; border-radius: 16px; font-weight: 700; outline: none; transition: all 0.2s; color: #1e293b; font-size: 16px; }
+      .input-premium { width: 100%; padding: 14px 18px; background-color: #f1f5f9; border: 1.5px solid transparent; border-radius: 16px; font-weight: 700; outline: none; transition: all 0.2s; color: #1e293b; font-size: 14px; }
       .input-premium:focus { border-color: var(--primary); background-color: white; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08); }
 
-      /* Gráfico */
-      .chart-container { height: 220px; display: flex; align-items: flex-end; gap: 12px; padding-top: 20px; }
-      .chart-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
-      .chart-bar-bg { width: 100%; background: #f1f5f9; border-radius: 12px; position: relative; height: 100%; overflow: hidden; }
-      .chart-bar-fill { position: absolute; bottom: 0; left: 0; width: 100%; background: var(--primary); border-radius: 12px; transition: height 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-      .chart-label { margin-top: 10px; font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
-      .chart-val-hint { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 9px; font-weight: 900; color: var(--primary); white-space: nowrap; opacity: 0; transition: opacity 0.2s; }
-      .chart-col:hover .chart-val-hint { opacity: 1; }
-
       .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
-      .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
       .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-      @media (max-width: 768px) {
-        .hide-mobile { display: none !important; }
-        .main-content { padding-bottom: 110px; }
-      }
-      @media (min-width: 769px) and (max-width: 1024px) {
-        .sidebar { width: 88px !important; }
-        .sidebar span, .sidebar .logo-text, .sidebar .links-label { display: none; }
-        .sidebar .nav-item { justify-content: center; padding: 16px; }
-      }
+      .animate-in { animation: fadeIn 0.4s ease-out; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+      .tab-btn { padding: 12px 24px; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; border-bottom: 3px solid transparent; transition: all 0.2s; }
+      .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+      @media (max-width: 768px) { .hide-mobile { display: none !important; } }
     </style>
   <script type="importmap">
 {
@@ -67,60 +53,59 @@
 }
 </script>
 </head>
-  <body class="bg-slate-50 text-slate-900">
+  <body class="bg-slate-50">
     
     <div id="modal-container" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
-      <div id="modal-box" class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20 max-h-[92vh] overflow-y-auto custom-scrollbar relative"></div>
+      <div id="modal-box" class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden max-h-[92vh] overflow-y-auto custom-scrollbar relative"></div>
     </div>
 
     <div class="flex h-screen overflow-hidden">
-      <aside class="sidebar bg-white border-r border-slate-200 w-72 flex flex-col z-40 shrink-0 hide-mobile">
+      <aside class="w-72 bg-white border-r border-slate-200 flex flex-col hide-mobile shrink-0">
         <div class="p-8 flex items-center gap-4">
-          <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-200 shrink-0"><i data-lucide="droplet" class="w-6 h-6"></i></div>
-          <span class="logo-text font-black text-2xl tracking-tighter text-slate-800">LAVA<span class="text-blue-600">PRO</span></span>
+          <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg"><i data-lucide="droplet"></i></div>
+          <span class="font-black text-2xl tracking-tighter">LAVA<span class="text-blue-600">PRO</span></span>
         </div>
-        <nav class="flex-1 px-4 space-y-2 overflow-y-auto custom-scrollbar">
-          <button onclick="navigateTo('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl font-bold text-sm text-slate-500 hover:bg-slate-50 transition-all"><i data-lucide="layout-dashboard"></i> <span>Dashboard</span></button>
-          <button onclick="navigateTo('patio')" id="nav-patio" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl font-bold text-sm text-slate-500 hover:bg-slate-50 transition-all"><i data-lucide="navigation"></i> <span>Pátio Ativo</span></button>
-          <button onclick="navigateTo('history')" id="nav-history" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl font-bold text-sm text-slate-500 hover:bg-slate-50 transition-all"><i data-lucide="clipboard-list"></i> <span>Histórico</span></button>
-          <button onclick="navigateTo('customers')" id="nav-customers" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl font-bold text-sm text-slate-500 hover:bg-slate-50 transition-all"><i data-lucide="users"></i> <span>Clientes</span></button>
-          <button onclick="navigateTo('financial')" id="nav-financial" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl font-bold text-sm text-slate-500 hover:bg-slate-50 transition-all"><i data-lucide="banknote"></i> <span>Financeiro</span></button>
+        <nav class="flex-1 px-4 space-y-2">
+          <button onclick="navigateTo('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl font-bold text-sm text-slate-500 hover:bg-slate-50"><i data-lucide="layout-dashboard"></i> Dashboard</button>
+          <button onclick="navigateTo('patio')" id="nav-patio" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl font-bold text-sm text-slate-500 hover:bg-slate-50"><i data-lucide="navigation"></i> Pátio Ativo</button>
+          <button onclick="navigateTo('customers')" id="nav-customers" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl font-bold text-sm text-slate-500 hover:bg-slate-50"><i data-lucide="users"></i> Clientes</button>
+          <button onclick="navigateTo('financial')" id="nav-financial" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl font-bold text-sm text-slate-500 hover:bg-slate-50"><i data-lucide="banknote"></i> Financeiro</button>
+          <button onclick="navigateTo('employees')" id="nav-employees" class="nav-item w-full flex items-center gap-4 p-4 rounded-2xl font-bold text-sm text-slate-500 hover:bg-slate-50"><i data-lucide="hard-hat"></i> Equipe</button>
         </nav>
       </aside>
 
-      <main class="flex-1 flex flex-col bg-[#f8fafc] overflow-hidden relative">
-        <header class="h-16 lg:h-24 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-4 lg:px-10 shrink-0 z-30">
-          <div>
-            <h2 id="view-title" class="font-black text-slate-900 uppercase text-[10px] lg:text-xs tracking-[0.25em]">DASHBOARD</h2>
-            <p id="header-subtitle" class="hidden lg:block text-[11px] font-bold text-slate-400 mt-1 uppercase tracking-widest"></p>
-          </div>
-          <div id="header-actions" class="flex items-center gap-2 lg:gap-4"></div>
+      <main class="flex-1 flex flex-col overflow-hidden">
+        <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-10 shrink-0">
+          <div><h2 id="view-title" class="font-black text-slate-900 uppercase text-xs tracking-[0.2em]">DASHBOARD</h2></div>
+          <div id="header-actions"></div>
         </header>
-
-        <div id="content" class="flex-1 overflow-y-auto p-4 lg:p-10 custom-scrollbar main-content"></div>
-
-        <nav class="fixed bottom-0 left-0 right-0 h-20 bg-white border-t border-slate-200 flex items-center justify-around px-2 z-50 lg:hidden shadow-[0_-10px_20px_rgba(0,0,0,0.03)]">
-          <button onclick="navigateTo('dashboard')" id="m-nav-dashboard" class="flex flex-col items-center justify-center flex-1 gap-1 text-slate-400"><i data-lucide="layout-dashboard" class="w-6 h-6"></i><span class="text-[9px] font-black uppercase tracking-tighter">Home</span></button>
-          <button onclick="navigateTo('patio')" id="m-nav-patio" class="flex flex-col items-center justify-center flex-1 gap-1 text-slate-400"><i data-lucide="navigation" class="w-6 h-6"></i><span class="text-[9px] font-black uppercase tracking-tighter">Pátio</span></button>
-          <button onclick="navigateTo('history')" id="m-nav-history" class="flex flex-col items-center justify-center flex-1 gap-1 text-slate-400"><i data-lucide="clipboard-list" class="w-6 h-6"></i><span class="text-[9px] font-black uppercase tracking-tighter">Histórico</span></button>
-          <button onclick="navigateTo('customers')" id="m-nav-customers" class="flex flex-col items-center justify-center flex-1 gap-1 text-slate-400"><i data-lucide="users" class="w-6 h-6"></i><span class="text-[9px] font-black uppercase tracking-tighter">Clientes</span></button>
-        </nav>
+        <div id="content" class="flex-1 overflow-y-auto p-10 custom-scrollbar"></div>
       </main>
     </div>
 
+    <nav class="fixed bottom-0 left-0 right-0 h-20 bg-white border-t border-slate-200 flex items-center justify-around z-50 lg:hidden shadow-2xl">
+      <button onclick="navigateTo('dashboard')" class="flex flex-col items-center gap-1 text-slate-400"><i data-lucide="layout-dashboard"></i><span class="text-[9px] font-black">HOME</span></button>
+      <button onclick="navigateTo('patio')" class="flex flex-col items-center gap-1 text-slate-400"><i data-lucide="navigation"></i><span class="text-[9px] font-black">PÁTIO</span></button>
+      <button onclick="navigateTo('financial')" class="flex flex-col items-center gap-1 text-slate-400"><i data-lucide="banknote"></i><span class="text-[9px] font-black">$$$</span></button>
+      <button onclick="navigateTo('employees')" class="flex flex-col items-center gap-1 text-slate-400"><i data-lucide="hard-hat"></i><span class="text-[9px] font-black">TIME</span></button>
+    </nav>
+
     <script type="module">
-      const DB_NAME = 'lavapro_hibrido_v5_wa';
+      const DB_NAME = 'lavapro_v2_finance';
       const DB = {
         save: (key, data) => localStorage.setItem(`${DB_NAME}_${key}`, JSON.stringify(data)),
         get: (key) => JSON.parse(localStorage.getItem(`${DB_NAME}_${key}`)) || [],
         init: () => {
           if (!localStorage.getItem(`${DB_NAME}_init`)) {
-            DB.save('customers', []); DB.save('services', []);
+            DB.save('customers', []); DB.save('services', []); 
+            DB.save('expenses', []); DB.save('employees', []);
             localStorage.setItem(`${DB_NAME}_init`, 'true');
           }
         }
       };
       DB.init();
+
+      let currentFinancialTab = 'income';
 
       window.closeModal = () => {
         document.getElementById('modal-container').classList.add('hidden');
@@ -128,80 +113,88 @@
       };
 
       window.sendWA = (phone, msg) => {
-        if(!phone) { alert('Cliente sem telefone cadastrado.'); return; }
-        const clean = phone.replace(/\D/g, '');
-        const url = `https://wa.me/55${clean}?text=${encodeURIComponent(msg)}`;
+        if(!phone) return alert('Telefone não cadastrado!');
+        const cleanPhone = phone.replace(/\D/g, '');
+        const url = `https://wa.me/55${cleanPhone}?text=${encodeURIComponent(msg)}`;
         window.open(url, '_blank');
+      };
+
+      window.copyToClipboard = (text, btn) => {
+        navigator.clipboard.writeText(text || '');
+        const old = btn.innerHTML;
+        btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i>';
+        lucide.createIcons();
+        setTimeout(() => { btn.innerHTML = old; lucide.createIcons(); }, 1500);
+      };
+
+      window.fetchAddress = async (cep) => {
+        const cleanCep = cep.replace(/\D/g, '');
+        if (cleanCep.length !== 8) return;
+        try {
+          const res = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
+          const data = await res.json();
+          if (!data.erro) {
+            const inputAddr = document.querySelector('[name="address"]');
+            const inputNeigh = document.querySelector('[name="neighborhood"]');
+            const inputCity = document.querySelector('[name="city"]');
+            
+            if(inputAddr) inputAddr.value = data.logradouro || '';
+            if(inputNeigh) inputNeigh.value = data.bairro || '';
+            if(inputCity) inputCity.value = `${data.localidade} - ${data.uf}`;
+          }
+        } catch (e) { console.error("CEP error", e); }
+      };
+
+      window.navigateTo = (vid) => {
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('nav-active'));
+        const dNav = document.getElementById(`nav-${vid}`);
+        if(dNav) dNav.classList.add('nav-active');
+        document.getElementById('view-title').innerText = vid.toUpperCase();
+        document.getElementById('content').innerHTML = views[vid] ? views[vid]() : '<h1>Erro</h1>';
+        window.updateHeaderActions(vid);
+        lucide.createIcons();
+      };
+
+      window.updateHeaderActions = (vid) => {
+        const actions = document.getElementById('header-actions');
+        actions.innerHTML = '';
+        if (vid === 'patio') {
+          actions.innerHTML = `<button onclick="openModal('service')" class="btn-action btn-blue px-6 py-4 text-xs uppercase tracking-widest shadow-lg shadow-blue-100"><i data-lucide="plus"></i> Nova Entrada</button>`;
+        } else if (vid === 'customers') {
+          actions.innerHTML = `<button onclick="openModal('customer')" class="btn-action btn-green px-6 py-4 text-xs uppercase tracking-widest shadow-lg shadow-emerald-100"><i data-lucide="user-plus"></i> Novo Cliente</button>`;
+        } else if (vid === 'financial') {
+          actions.innerHTML = `<button onclick="openModal('expense')" class="btn-action btn-red px-6 py-4 text-xs uppercase tracking-widest shadow-lg shadow-red-100"><i data-lucide="trending-down"></i> Lançar Despesa</button>`;
+        } else if (vid === 'employees') {
+          actions.innerHTML = `<button onclick="openModal('employee')" class="btn-action btn-blue px-6 py-4 text-xs uppercase tracking-widest shadow-lg shadow-blue-100"><i data-lucide="plus"></i> Novo Funcionário</button>`;
+        }
+        lucide.createIcons();
       };
 
       const views = {
         dashboard: () => {
-          const services = DB.get('services');
-          const today = new Date().toLocaleDateString('pt-BR');
-          const revenueToday = services.filter(s => s.entryDate === today && s.paid).reduce((a, b) => a + b.value, 0);
-          const patioCount = services.filter(s => s.status !== 'Entregue').length;
-
-          const days = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-          const stats = [];
-          for (let i = 6; i >= 0; i--) {
-            const d = new Date(); d.setDate(d.getDate() - i);
-            const ds = d.toLocaleDateString('pt-BR');
-            const val = services.filter(s => s.entryDate === ds).reduce((a, b) => a + b.value, 0);
-            stats.push({ label: days[d.getDay()], value: val, isToday: ds === today });
-          }
-          const maxValue = Math.max(...stats.map(s => s.value), 100);
-
+          const services = DB.get('services').filter(s => s.paid);
+          const expenses = DB.get('expenses');
+          const totalIncome = services.reduce((a, b) => a + (Number(b.value) || 0), 0);
+          const totalExpense = expenses.reduce((a, b) => a + (Number(b.value) || 0), 0);
           return `
             <div class="animate-in space-y-8">
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="glass-card p-8 bg-blue-600 text-white shadow-2xl shadow-blue-200">
-                  <p class="text-[10px] font-black uppercase opacity-60 tracking-widest">Caixa Hoje</p>
-                  <h3 class="text-4xl font-black mt-2 tracking-tighter">R$ ${revenueToday.toFixed(2)}</h3>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass-card p-8 bg-blue-600 text-white shadow-2xl">
+                  <p class="text-[10px] font-black uppercase opacity-60 tracking-widest">Saldo Real</p>
+                  <h3 class="text-4xl font-black mt-2">R$ ${(totalIncome - totalExpense).toFixed(2)}</h3>
                 </div>
-                <div class="glass-card p-8 border-l-4 border-l-blue-600">
-                  <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">No Pátio Agora</p>
-                  <h3 class="text-4xl font-black text-slate-800 mt-2 tracking-tighter">${patioCount} <span class="text-xs opacity-40">CARROS</span></h3>
+                <div class="glass-card p-8 border-l-8 border-l-emerald-500">
+                  <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Entradas (Pagos)</p>
+                  <h3 class="text-3xl font-black text-slate-800 mt-2">R$ ${totalIncome.toFixed(2)}</h3>
                 </div>
-                <div class="glass-card p-8 border-l-4 border-l-emerald-600 hidden lg:block">
-                  <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Clientes</p>
-                  <h3 class="text-4xl font-black text-slate-800 mt-2 tracking-tighter">${DB.get('customers').length}</h3>
+                <div class="glass-card p-8 border-l-8 border-l-red-500">
+                  <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Saídas (Custos)</p>
+                  <h3 class="text-3xl font-black text-slate-800 mt-2">R$ ${totalExpense.toFixed(2)}</h3>
                 </div>
               </div>
-
-              <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                <div class="xl:col-span-2 glass-card p-8 lg:p-10">
-                  <div class="flex justify-between items-center mb-10">
-                    <h3 class="font-black text-slate-900 uppercase text-[11px] tracking-widest">Faturamento Semanal</h3>
-                  </div>
-                  <div class="chart-container">
-                    ${stats.map(s => `
-                      <div class="chart-col">
-                        <div class="chart-bar-bg">
-                           <div class="chart-bar-fill ${s.isToday ? 'bg-blue-700 shadow-xl' : ''}" style="height: ${(s.value / maxValue) * 100}%">
-                             <span class="chart-val-hint">R$${Math.round(s.value)}</span>
-                           </div>
-                        </div>
-                        <span class="chart-label ${s.isToday ? 'text-blue-600 font-black' : ''}">${s.label}</span>
-                      </div>
-                    `).join('')}
-                  </div>
-                </div>
-
-                <div class="glass-card p-8 flex flex-col">
-                   <h3 class="font-black text-slate-900 uppercase text-[11px] tracking-widest mb-8">Atividade</h3>
-                   <div class="space-y-6 flex-1">
-                      ${services.slice(-5).reverse().map(s => `
-                        <div class="flex items-center gap-4">
-                          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white" style="background-color: ${s.vehicleColor || '#2563eb'}"><i data-lucide="${s.vehicleIcon || 'car'}" class="w-5 h-5"></i></div>
-                          <div class="flex-1 min-w-0">
-                            <p class="text-xs font-black text-slate-800 truncate uppercase">${s.car}</p>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">${s.entryTime} • ${s.plate}</p>
-                          </div>
-                          <span class="text-xs font-black text-blue-600">R$${Math.round(s.value)}</span>
-                        </div>
-                      `).join('') || '<p class="text-center py-10 opacity-20 font-black text-xs uppercase tracking-widest">Vazio</p>'}
-                   </div>
-                </div>
+              <div class="glass-card p-10 bg-slate-900 text-white flex items-center justify-between">
+                <div><h4 class="font-black text-blue-400 text-xs tracking-widest uppercase">Prazos & Pagamentos</h4><p class="text-sm opacity-60">Prazos de 10, 15, 20 e 30 dias ativos.</p></div>
+                <button onclick="navigateTo('patio')" class="px-6 py-3 bg-blue-600 rounded-xl font-bold text-xs uppercase shadow-xl">Ver Pátio Ativo</button>
               </div>
             </div>
           `;
@@ -209,219 +202,298 @@
         patio: () => {
           const services = DB.get('services').filter(s => s.status !== 'Entregue');
           return `
-            <div class="animate-in space-y-8">
-              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                ${services.map(s => `
-                  <div class="glass-card p-6 flex items-center gap-6 border-l-[12px] ${s.status === 'Pronto' ? 'border-l-emerald-500 bg-emerald-50/20' : (s.status === 'Em Lavagem' ? 'border-l-blue-500' : 'border-l-amber-400')}">
-                    <div class="w-16 h-16 rounded-3xl flex items-center justify-center shrink-0" style="background-color: ${s.vehicleColor || '#2563eb'}20"><i data-lucide="${s.vehicleIcon || 'car'}" class="w-8 h-8" style="color: ${s.vehicleColor || '#2563eb'}"></i></div>
+            <div class="animate-in grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              ${services.map(s => {
+                const msgPronto = `Olá! O seu veículo ${s.car} (${s.plate}) já está PRONTO aqui no Lava Pro! ✨ Pode vir buscar quando quiser.`;
+                return `
+                <div class="glass-card p-6 border-l-[12px] ${s.status === 'Pronto' ? 'border-l-emerald-500 bg-emerald-50/10' : (s.status === 'Em Lavagem' ? 'border-l-blue-500' : 'border-l-amber-500')}">
+                  <div class="flex items-center gap-4 mb-5">
+                    <div class="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600"><i data-lucide="car"></i></div>
                     <div class="flex-1 min-w-0">
-                      <div class="flex items-center gap-2 mb-1"><h4 class="font-black text-slate-900 uppercase text-base truncate">${s.car}</h4><span class="bg-slate-900 text-white px-1.5 py-0.5 rounded-lg text-[10px] font-black">${s.plate}</span></div>
-                      <p class="text-[11px] font-bold text-slate-400 uppercase mb-3 truncate tracking-widest">${s.type}</p>
-                      <div class="flex items-center gap-2">
-                        <select onchange="updateStatus('${s.id}', this.value)" class="flex-1 bg-slate-100 border-none text-[10px] font-black uppercase px-3 py-2.5 rounded-xl outline-none cursor-pointer">
-                          <option value="Aguardando" ${s.status === 'Aguardando' ? 'selected' : ''}>⏳ Aguardar</option>
-                          <option value="Em Lavagem" ${s.status === 'Em Lavagem' ? 'selected' : ''}>🫧 Lavando</option>
-                          <option value="Pronto" ${s.status === 'Pronto' ? 'selected' : ''}>✨ Pronto</option>
-                          <option value="Entregue">🚀 Entregar</option>
-                        </select>
-                        <button onclick="sendWA('${s.phone}', 'Olá! Seu veículo ${s.car} placa ${s.plate} já está PRONTO aqui no Lava Pro. Pode vir buscar! ✨')" class="w-10 h-10 bg-green-100 text-green-600 rounded-xl flex items-center justify-center transition-all hover:bg-green-600 hover:text-white" title="Avisar no WhatsApp"><i data-lucide="phone" class="w-5 h-5"></i></button>
-                        <button onclick="openPaymentModal('${s.id}')" class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center active:scale-90 transition-transform"><i data-lucide="check" class="w-5 h-5"></i></button>
-                      </div>
+                      <h4 class="font-black uppercase text-sm truncate">${s.car}</h4>
+                      <span class="bg-slate-900 text-white px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest">${s.plate}</span>
                     </div>
+                    <button onclick="sendWA('${s.phone}', '${msgPronto}')" class="w-12 h-12 bg-green-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-green-100 hover:scale-105 transition-all" title="Avisar que está pronto">
+                      <i data-lucide="message-circle"></i>
+                    </button>
                   </div>
-                `).join('') || '<p class="col-span-full py-20 text-center opacity-30 font-black text-xs uppercase tracking-[0.3em]">Pátio vazio</p>'}
-              </div>
-            </div>
-          `;
-        },
-        history: () => {
-          const services = [...DB.get('services')].reverse();
-          return `
-            <div class="animate-in glass-card overflow-hidden">
-              <div class="overflow-x-auto custom-scrollbar">
-                <table class="w-full text-left min-w-[900px]">
-                  <thead class="bg-slate-50 border-b text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    <tr><th class="px-8 py-6">Data</th><th class="px-8 py-6">Veículo</th><th class="px-8 py-6">Serviço</th><th class="px-8 py-6 text-right">Valor</th><th class="px-8 py-6 text-right">Ações</th></tr>
-                  </thead>
-                  <tbody class="divide-y divide-slate-100">
-                    ${services.map(s => `
-                      <tr class="hover:bg-slate-50/50">
-                        <td class="px-8 py-6"><p class="font-black text-slate-800 text-xs">${s.entryDate}</p><p class="text-[10px] text-slate-400">${s.entryTime}</p></td>
-                        <td class="px-8 py-6 flex items-center gap-4"><div class="w-8 h-8 rounded-xl flex items-center justify-center text-white" style="background-color: ${s.vehicleColor || '#2563eb'}"><i data-lucide="${s.vehicleIcon || 'car'}" class="w-4 h-4"></i></div><div><p class="font-black text-slate-800 uppercase text-xs">${s.car}</p><p class="text-[9px] font-black bg-slate-100 px-1.5 rounded inline-block uppercase mt-1">${s.plate}</p></div></td>
-                        <td class="px-8 py-6 font-bold text-slate-500 text-xs uppercase">${s.type}</td>
-                        <td class="px-8 py-6 text-right font-black text-blue-600 text-sm">R$ ${s.value.toFixed(2)}</td>
-                        <td class="px-8 py-6 text-right flex justify-end gap-2"><button onclick="openEditModal('${s.id}')" class="p-2 text-blue-400 hover:bg-blue-50 rounded-lg transition-all"><i data-lucide="pencil" class="w-4 h-4"></i></button><button onclick="deleteService('${s.id}')" class="p-2 text-red-400 hover:bg-red-50 rounded-lg transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td>
-                      </tr>
-                    `).join('') || '<tr><td colspan="5" class="p-20 text-center opacity-30 font-black text-xs uppercase">Sem histórico</td></tr>'}
-                  </tbody>
-                </table>
-              </div>
+                  <div class="space-y-4">
+                    <select onchange="updateStatus('${s.id}', this.value)" class="w-full bg-slate-100 p-4 rounded-2xl text-[10px] font-black uppercase outline-none cursor-pointer">
+                      <option value="Aguardando" ${s.status === 'Aguardando' ? 'selected' : ''}>⏳ Na Fila</option>
+                      <option value="Em Lavagem" ${s.status === 'Em Lavagem' ? 'selected' : ''}>🫧 Lavando...</option>
+                      <option value="Pronto" ${s.status === 'Pronto' ? 'selected' : ''}>✨ Finalizado</option>
+                      <option value="Entregue">🚀 Entregar & Receber</option>
+                    </select>
+                  </div>
+                </div>
+              `}).join('') || '<div class="col-span-full py-20 text-center opacity-20 font-black uppercase tracking-widest">Nenhum veículo no pátio</div>'}
             </div>
           `;
         },
         customers: () => {
           const custs = DB.get('customers');
           return `
-            <div class="animate-in grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div class="animate-in grid grid-cols-1 md:grid-cols-3 gap-6">
               ${custs.map(c => `
-                <div class="glass-card p-8 border-t-[8px] border-t-emerald-500">
-                  <div class="flex items-center gap-5 mb-6">
-                    <div class="w-16 h-16 bg-slate-50 border rounded-3xl flex items-center justify-center"><i data-lucide="${c.vehicleIcon || 'car'}" class="w-8 h-8" style="color: ${c.vehicleColor}"></i></div>
-                    <div class="flex-1 min-w-0">
-                      <h4 class="font-black text-slate-900 uppercase text-lg truncate">${c.name}</h4>
-                      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">${c.model} • ${c.plate}</p>
-                    </div>
+                <div class="glass-card p-8">
+                  <div class="flex justify-between items-start mb-6">
+                    <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 font-black text-xl">${c.name[0]}</div>
+                    <button onclick="sendWA('${c.phone}', 'Olá ${c.name}, como vai? Gostaria de agendar uma lavagem conosco?')" class="bg-green-100 text-green-600 p-3 rounded-2xl hover:bg-green-500 hover:text-white transition-all shadow-sm">
+                      <i data-lucide="message-circle"></i>
+                    </button>
                   </div>
-                  <div class="pt-6 border-t border-slate-50 flex items-center justify-between">
-                     <div class="flex items-center gap-2">
-                        <button onclick="sendWA('${c.phone}', 'Olá ${c.name}, tudo bem?')" class="w-10 h-10 bg-green-600 text-white rounded-xl flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-green-100"><i data-lucide="phone" class="w-5 h-5"></i></button>
-                        <span class="text-[11px] font-black text-slate-400 uppercase ml-2">${c.phone || 'S/ Tel'}</span>
-                     </div>
-                     <span class="bg-emerald-50 text-emerald-600 px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-tighter">${c.washes || 0}/10</span>
+                  <h4 class="font-black text-slate-800 uppercase text-sm">${c.name}</h4>
+                  <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">${c.cpf}</p>
+                  <div class="mt-6 space-y-3 pt-6 border-t">
+                    <p class="text-[10px] text-slate-500 font-black uppercase flex items-center gap-2"><i data-lucide="map-pin" class="w-3 h-3"></i> ${c.address || 'Sem Endereço'}</p>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase"><i data-lucide="hash" class="w-3 h-3 inline"></i> CEP: ${c.cep || '00000-000'}</p>
+                    <p class="text-xs text-slate-600 font-black"><i data-lucide="phone" class="w-3 h-3 inline"></i> ${c.phone}</p>
                   </div>
                 </div>
-              `).join('') || '<p class="col-span-full py-20 text-center opacity-20 font-black text-xs uppercase tracking-[0.5em]">Base vazia</p>'}
+              `).join('') || '<p class="col-span-full text-center py-20 opacity-20 font-black">Nenhum cliente cadastrado.</p>'}
             </div>
           `;
         },
         financial: () => {
-          const total = DB.get('services').filter(x => x.paid).reduce((a, b) => a + b.value, 0);
+          const services = DB.get('services').filter(s => s.paid);
+          const expenses = DB.get('expenses');
           return `
-            <div class="animate-in grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div class="glass-card p-12 bg-blue-600 text-white shadow-2xl shadow-blue-200">
-                 <p class="text-[12px] font-black uppercase opacity-60 tracking-widest">Saldo Bruto</p>
-                 <h2 class="text-6xl font-black mt-4 tracking-tighter">R$ ${total.toFixed(2)}</h2>
+            <div class="animate-in space-y-6">
+              <div class="flex border-b border-slate-200 mb-8">
+                <button onclick="changeFinancialTab('income')" class="tab-btn ${currentFinancialTab === 'income' ? 'active' : ''}">Faturamento (NFe)</button>
+                <button onclick="changeFinancialTab('expense')" class="tab-btn ${currentFinancialTab === 'expense' ? 'active' : ''}">Despesas</button>
               </div>
-              <div class="glass-card p-12 bg-slate-900 text-white flex flex-col justify-between">
-                 <div><p class="text-[12px] font-black uppercase text-slate-500 tracking-widest">Rio Verde Online</p><p class="text-xs text-slate-400 mt-2 font-bold uppercase leading-relaxed">Sincronize serviços e gere sua NFe no portal municipal.</p></div>
-                 <a href="https://servicos.rioverde.go.gov.br/" target="_blank" class="w-full py-6 bg-white/10 text-center rounded-2xl font-black text-[12px] uppercase tracking-widest hover:bg-white/20 transition-all border border-white/5 mt-8">Abrir Prefeitura</a>
-              </div>
+              ${currentFinancialTab === 'income' ? `
+                <div class="glass-card overflow-hidden">
+                  <table class="w-full text-left">
+                    <thead class="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b">
+                      <tr><th class="px-8 py-4">Data</th><th class="px-8 py-4">Cliente/Endereço</th><th class="px-8 py-4">Pagamento/Prazo</th><th class="px-8 py-4 text-right">Valor</th><th class="px-8 py-4 text-right">Ações</th></tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                      ${services.reverse().map(s => {
+                        const val = Number(s.value) || 0;
+                        const recMsg = `*Lava Pro - Comprovante*%0A%0AOlá! Aqui está o resumo do seu serviço:%0A*Veículo:* ${s.car}%0A*Placa:* ${s.plate}%0A*Valor:* R$ ${val.toFixed(2)}%0A*Data:* ${s.entryDate}%0A*Pagamento:* ${s.method} (${s.term})%0A*Obs:* ${s.obs || '-'}%0A%0A_Obrigado pela preferência!_`;
+                        return `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                          <td class="px-8 py-5 text-xs font-bold text-slate-500">${s.entryDate}</td>
+                          <td class="px-8 py-5">
+                            <p class="font-black text-xs uppercase text-slate-800">${s.car}</p>
+                            <p class="text-[9px] text-slate-400 font-bold">${s.customerCpf || 'Sem CPF'}</p>
+                            <p class="text-[8px] text-slate-300 font-bold uppercase truncate max-w-[140px]">${s.customerAddress || ''}</p>
+                          </td>
+                          <td class="px-8 py-5">
+                            <p class="text-[10px] font-black text-blue-600 uppercase">${s.method || 'PIX'}</p>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase">${s.term || 'À Vista'}</p>
+                            ${s.obs ? `<p class="text-[8px] italic text-amber-600 font-bold mt-1">"${s.obs}"</p>` : ''}
+                          </td>
+                          <td class="px-8 py-5 text-right font-black text-sm">R$ ${val.toFixed(2)}</td>
+                          <td class="px-8 py-5 text-right flex justify-end gap-2">
+                            <button onclick="sendWA('${s.phone}', '${recMsg}')" title="Enviar Comprovante WhatsApp" class="p-2.5 bg-green-100 text-green-600 rounded-xl hover:bg-green-500 hover:text-white transition-all"><i data-lucide="send" class="w-4 h-4"></i></button>
+                            <button onclick="copyToClipboard('${s.customerCpf}', this)" title="Copiar CPF" class="p-2.5 bg-slate-100 text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                            <button onclick="copyToClipboard('${s.term}', this)" title="Copiar Prazo" class="p-2.5 bg-slate-100 text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all"><i data-lucide="calendar" class="w-4 h-4"></i></button>
+                          </td>
+                        </tr>
+                      `}).join('') || '<tr><td colspan="5" class="p-20 text-center opacity-30 font-black uppercase">Nenhuma receita registrada</td></tr>'}
+                    </tbody>
+                  </table>
+                </div>
+              ` : `
+                <div class="glass-card overflow-hidden">
+                  <table class="w-full text-left">
+                    <thead class="bg-slate-50 text-[10px] font-black text-slate-400 uppercase border-b">
+                      <tr><th class="px-8 py-4">Data</th><th class="px-8 py-4">Categoria</th><th class="px-8 py-4">Descrição</th><th class="px-8 py-4 text-right">Valor</th></tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                      ${expenses.reverse().map(e => `
+                        <tr>
+                          <td class="px-8 py-5 text-xs font-bold text-slate-500">${e.date}</td>
+                          <td class="px-8 py-5"><span class="bg-red-50 text-red-600 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase">${e.category}</span></td>
+                          <td class="px-8 py-5 text-xs font-bold text-slate-600 uppercase">${e.description}</td>
+                          <td class="px-8 py-5 text-right font-black text-sm text-red-600">R$ ${(Number(e.value) || 0).toFixed(2)}</td>
+                        </tr>
+                      `).join('') || '<tr><td colspan="4" class="p-20 text-center opacity-30 font-black uppercase">Nenhuma despesa registrada</td></tr>'}
+                    </tbody>
+                  </table>
+                </div>
+              `}
+            </div>
+          `;
+        },
+        employees: () => {
+          const employees = DB.get('employees');
+          return `
+            <div class="animate-in grid grid-cols-1 md:grid-cols-2 gap-6">
+              ${employees.map(e => {
+                const totalDebt = (Number(e.advances) || 0) + (Number(e.consumption) || 0);
+                const netSalary = (Number(e.salary) || 0) - totalDebt;
+                return `
+                  <div class="glass-card p-8">
+                    <div class="flex justify-between items-start mb-6">
+                      <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-black text-xl">${e.name[0]}</div>
+                        <div><h4 class="font-black text-lg uppercase">${e.name}</h4><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Salário: R$ ${(Number(e.salary) || 0).toFixed(2)}</p></div>
+                      </div>
+                      <button onclick="deleteEmployee('${e.id}')" class="text-slate-300 hover:text-red-500 transition-all"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                      <div class="bg-amber-50 p-5 rounded-3xl">
+                        <p class="text-[9px] font-black text-amber-600 uppercase mb-2">Vales / Vales</p>
+                        <p class="font-black text-slate-800 text-lg">R$ ${(Number(e.advances) || 0).toFixed(2)}</p>
+                      </div>
+                      <div class="bg-red-50 p-5 rounded-3xl">
+                        <p class="text-[9px] font-black text-red-600 uppercase mb-2">Consumação</p>
+                        <p class="font-black text-slate-800 text-lg">R$ ${(Number(e.consumption) || 0).toFixed(2)}</p>
+                      </div>
+                    </div>
+                    <div class="pt-6 border-t flex items-center justify-between">
+                      <div><p class="text-[10px] font-black text-slate-400 uppercase">Saldo Final</p><h4 class="text-2xl font-black text-emerald-600">R$ ${netSalary.toFixed(2)}</h4></div>
+                      <button onclick="openModal('add_debt', '${e.id}')" class="bg-slate-900 text-white px-5 py-3 rounded-2xl text-[10px] font-black uppercase shadow-xl">+ Débito</button>
+                    </div>
+                  </div>
+                `;
+              }).join('') || '<p class="col-span-full py-20 text-center opacity-20 font-black uppercase">Nenhum funcionário</p>'}
             </div>
           `;
         }
       };
 
-      window.updateHeaderActions = (vid) => {
-        const actions = document.getElementById('header-actions');
-        actions.innerHTML = '';
-        const btnEntrada = `<button onclick="openModal('service')" class="btn-action btn-blue px-4 py-3 lg:px-6 lg:py-4 text-[10px] lg:text-[11px] uppercase tracking-widest shadow-xl shadow-blue-100"><i data-lucide="car-front" class="w-4 h-4"></i> <span class="hidden sm:inline">Entrada Pátio</span></button>`;
-        const btnCliente = `<button onclick="openModal('customer')" class="btn-action btn-green px-4 py-3 lg:px-6 lg:py-4 text-[10px] lg:text-[11px] uppercase tracking-widest shadow-xl shadow-emerald-100"><i data-lucide="user-plus" class="w-4 h-4"></i> <span class="hidden sm:inline">Novo Cliente</span></button>`;
-        if (vid === 'dashboard') actions.innerHTML = btnEntrada + btnCliente;
-        else if (vid === 'patio') actions.innerHTML = btnEntrada;
-        else if (vid === 'customers') actions.innerHTML = btnCliente;
-        else actions.innerHTML = btnEntrada;
-        lucide.createIcons();
-      };
-
-      window.navigateTo = (vid) => {
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('nav-active'));
-        document.querySelectorAll('.mobile-nav button')?.forEach(el => el.classList.remove('text-blue-600', 'font-black'));
-        const dNav = document.getElementById(`nav-${vid}`);
-        const mNav = document.getElementById(`m-nav-${vid}`);
-        if(dNav) dNav.classList.add('nav-active');
-        if(mNav) mNav.classList.add('text-blue-600', 'font-black');
-        document.getElementById('view-title').innerText = vid.toUpperCase();
-        document.getElementById('header-subtitle').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
-        document.getElementById('content').innerHTML = views[vid]();
-        window.updateHeaderActions(vid);
-        lucide.createIcons();
-      };
+      window.changeFinancialTab = (tab) => { currentFinancialTab = tab; window.navigateTo('financial'); };
 
       window.updateStatus = (id, val) => {
         const s = DB.get('services');
         const i = s.findIndex(x => String(x.id) === String(id));
         if(i !== -1) {
-          s[i].status = val;
-          if(val === 'Entregue') window.openPaymentModal(id);
-          else { DB.save('services', s); window.navigateTo('patio'); }
+          if(val === 'Entregue') window.openCheckoutModal(id);
+          else { s[i].status = val; DB.save('services', s); window.navigateTo('patio'); }
         }
       };
 
-      window.deleteService = (id) => {
-        if(confirm('Apagar permanentemente?')) {
-          const s = DB.get('services').filter(x => String(x.id) !== String(id));
-          DB.save('services', s); window.navigateTo('history');
-        }
-      };
-
-      window.openModal = (type) => {
-        const m = document.getElementById('modal-container');
-        const b = document.getElementById('modal-box');
-        m.classList.remove('hidden'); m.classList.add('flex');
-        b.innerHTML = '';
-
-        if(type === 'customer') {
-          b.innerHTML = `
-            <div class="p-8 border-b flex justify-between items-center bg-slate-50"><h3 class="font-black text-slate-800 uppercase text-xs tracking-widest">Novo Cliente</h3><button onclick="closeModal()"><i data-lucide="x"></i></button></div>
-            <form id="f-customer" class="p-8 space-y-5">
-              <input name="name" required placeholder="Nome do Cliente" class="input-premium">
-              <input name="phone" required type="tel" pattern="[0-9]{10,11}" placeholder="WhatsApp (DDD + Número)" class="input-premium">
-              <div class="grid grid-cols-2 gap-4"><input name="model" required placeholder="Veículo" class="input-premium uppercase"><input name="plate" required placeholder="Placa" class="input-premium uppercase"></div>
-              <input type="hidden" name="vehicleIcon" id="selected-icon" value="car">
-              <div class="flex gap-4 overflow-x-auto pb-4 custom-scrollbar">
-                ${['car','truck','bike'].map(i => `<div onclick="selectIcon('${i}')" data-icon="${i}" class="icon-option p-6 border-2 rounded-[2rem] border-slate-100 flex items-center justify-center cursor-pointer transition-all"><i data-lucide="${i}" class="w-8 h-8"></i></div>`).join('')}
-              </div>
-              <button type="submit" class="w-full py-6 btn-action btn-green uppercase text-xs tracking-widest shadow-xl shadow-emerald-50">Gravar Dados</button>
-            </form>
-          `;
-        } else if(type === 'service') {
-          const c = DB.get('customers');
-          b.innerHTML = `
-            <div class="p-8 border-b flex justify-between items-center bg-slate-50"><h3 class="font-black text-slate-800 uppercase text-xs tracking-widest">Entrada Pátio</h3><button onclick="closeModal()"><i data-lucide="x"></i></button></div>
-            <form id="f-service" class="p-8 space-y-5">
-              <select name="customerId" required class="input-premium appearance-none">
-                <option value="">-- Escolha o Veículo --</option>
-                ${c.map(x => `<option value="${x.id}">${x.name.toUpperCase()} (${x.plate})</option>`).join('')}
-              </select>
-              <input name="type" required placeholder="Tipo de Lavagem" class="input-premium">
-              <input name="value" type="number" step="0.01" required placeholder="Valor R$" class="input-premium">
-              <button type="submit" class="w-full py-6 btn-action btn-blue uppercase text-sm tracking-widest shadow-xl">🚀 Iniciar Lavagem</button>
-            </form>
-          `;
-        }
-        lucide.createIcons();
-      };
-
-      window.openEditModal = (id) => {
+      window.openCheckoutModal = (id) => {
         const s = DB.get('services').find(x => String(x.id) === String(id));
+        const val = Number(s.value) || 0;
         const b = document.getElementById('modal-box');
         const m = document.getElementById('modal-container');
         m.classList.remove('hidden'); m.classList.add('flex');
         b.innerHTML = `
-          <div class="p-8 border-b bg-slate-50 flex justify-between items-center"><h3 class="font-black text-slate-800 uppercase text-xs tracking-widest">Editar Registro</h3><button onclick="closeModal()"><i data-lucide="x"></i></button></div>
-          <form id="f-edit-service" data-id="${id}" class="p-8 space-y-5">
-            <div class="grid grid-cols-2 gap-4"><input name="car" required value="${s.car}" class="input-premium uppercase"><input name="plate" required value="${s.plate}" class="input-premium uppercase"></div>
-            <input name="type" required value="${s.type}" class="input-premium">
-            <input name="value" type="number" step="0.01" required value="${s.value}" class="input-premium">
-            <button type="submit" class="w-full py-6 btn-action btn-blue uppercase text-xs tracking-widest shadow-xl">Salvar Mudanças</button>
+          <div class="p-8 bg-slate-50 border-b flex justify-between items-center"><h3 class="font-black text-xs uppercase tracking-widest">Receber & Entregar</h3><button onclick="closeModal()"><i data-lucide="x"></i></button></div>
+          <form id="f-checkout" data-id="${id}" class="p-8 space-y-5">
+            <div class="p-8 bg-blue-600 text-white rounded-[2rem] text-center shadow-xl shadow-blue-100">
+              <p class="text-[10px] font-black uppercase opacity-60">Valor do Serviço</p>
+              <h2 class="text-5xl font-black mt-2">R$ ${val.toFixed(2)}</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="text-[10px] font-black uppercase text-slate-400 mb-2 block">Forma de Pagamento</label>
+                <select name="method" required class="input-premium">
+                  <option value="PIX">PIX</option>
+                  <option value="Dinheiro">Dinheiro</option>
+                  <option value="Cartão Débito">Cartão Débito</option>
+                  <option value="Cartão Crédito">Cartão Crédito</option>
+                  <option value="Boleto">Boleto</option>
+                  <option value="Convênio">Convênio</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[10px] font-black uppercase text-slate-400 mb-2 block">Prazo (Dias)</label>
+                <select name="term" required class="input-premium">
+                  <option value="À Vista">À Vista</option>
+                  <option value="10 dias">10 dias</option>
+                  <option value="15 dias">15 dias</option>
+                  <option value="20 dias">20 dias</option>
+                  <option value="30 dias">30 dias</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-[10px] font-black uppercase text-slate-400 mb-2 block">Observações / Notas</label>
+              <textarea name="obs" placeholder="Ex: Cliente pediu para faturar no CNPJ..." class="input-premium h-24 resize-none"></textarea>
+            </div>
+
+            <button type="submit" class="w-full py-6 btn-action btn-green uppercase text-xs tracking-widest shadow-2xl">Confirmar Pagamento</button>
           </form>
         `;
         lucide.createIcons();
       };
 
-      window.openPaymentModal = (id) => {
-        const s = DB.get('services').find(x => String(x.id) === String(id));
+      window.openModal = (type, param) => {
         const b = document.getElementById('modal-box');
         const m = document.getElementById('modal-container');
         m.classList.remove('hidden'); m.classList.add('flex');
-        b.innerHTML = `
-          <div class="p-12 text-center space-y-8">
-             <div class="w-24 h-24 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto"><i data-lucide="check" class="w-12 h-12"></i></div>
-             <div><h3 class="font-black text-slate-800 text-3xl tracking-tight">Pagamento</h3><p class="text-xs font-bold text-slate-400 uppercase mt-3 tracking-[0.3em]">${s.car} • R$ ${s.value.toFixed(2)}</p></div>
-             <form id="f-payment" data-id="${id}" class="space-y-4">
-               <button type="submit" class="w-full py-6 btn-action btn-green uppercase text-sm tracking-[0.2em] shadow-2xl">Confirmar e Entregar</button>
-               <button type="button" onclick="closeModal()" class="w-full py-4 text-slate-400 font-bold uppercase text-[10px]">Voltar</button>
-             </form>
-          </div>
-        `;
-        lucide.createIcons();
-      };
+        b.innerHTML = '';
 
-      window.selectIcon = (iconName) => {
-        document.querySelectorAll('.icon-option').forEach(opt => opt.classList.remove('border-blue-600', 'bg-blue-50'));
-        const target = document.querySelector(`[data-icon="${iconName}"]`);
-        if (target) { target.classList.add('border-blue-600', 'bg-blue-50'); }
-        document.getElementById('selected-icon').value = iconName;
+        if(type === 'customer') {
+          b.innerHTML = `
+            <div class="p-8 bg-slate-50 border-b flex justify-between"><h3 class="font-black text-xs uppercase">Cadastro de Cliente</h3><button onclick="closeModal()"><i data-lucide="x"></i></button></div>
+            <form id="f-customer" class="p-8 space-y-4">
+              <input name="name" required placeholder="Nome Completo" class="input-premium">
+              <input name="cpf" required placeholder="CPF para NFe" class="input-premium">
+              <input name="phone" required placeholder="WhatsApp (DDD + Número)" class="input-premium">
+              <div class="pt-4 border-t"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Endereço (NFe Rio Verde)</p></div>
+              <input name="cep" required placeholder="CEP" onblur="fetchAddress(this.value)" class="input-premium">
+              <div class="grid grid-cols-2 gap-4">
+                <input name="address" required placeholder="Rua" class="input-premium">
+                <input name="neighborhood" required placeholder="Bairro" class="input-premium">
+              </div>
+              <input name="city" required placeholder="Cidade - UF" value="Rio Verde - GO" class="input-premium">
+              <div class="grid grid-cols-2 gap-4"><input name="model" placeholder="Veículo" class="input-premium uppercase"><input name="plate" placeholder="Placa" class="input-premium uppercase"></div>
+              <button type="submit" class="w-full py-6 btn-action btn-blue uppercase text-xs">Cadastrar</button>
+            </form>
+          `;
+        } else if(type === 'service') {
+          const c = DB.get('customers');
+          b.innerHTML = `
+            <div class="p-8 bg-slate-50 border-b flex justify-between"><h3 class="font-black text-xs uppercase">Novo Carro no Pátio</h3><button onclick="closeModal()"><i data-lucide="x"></i></button></div>
+            <form id="f-service" class="p-8 space-y-4">
+              <select name="customerId" required class="input-premium">
+                <option value="">Selecione o Cliente</option>
+                ${c.map(x => `<option value="${x.id}">${x.name.toUpperCase()} (${x.plate})</option>`).join('')}
+              </select>
+              <input name="type" required placeholder="O que será feito?" class="input-premium">
+              <input name="value" type="number" step="0.01" required placeholder="Valor R$" class="input-premium">
+              <button type="submit" class="w-full py-6 btn-action btn-blue uppercase text-xs">Dar Entrada</button>
+            </form>
+          `;
+        } else if(type === 'expense') {
+          b.innerHTML = `
+            <div class="p-8 bg-slate-50 border-b flex justify-between"><h3 class="font-black text-xs uppercase tracking-widest">Nova Despesa</h3><button onclick="closeModal()"><i data-lucide="x"></i></button></div>
+            <form id="f-expense" class="p-8 space-y-4">
+              <select name="category" required class="input-premium">
+                <option value="Produtos">Produtos (shampoo, pretinho)</option>
+                <option value="Luz">Energia Elétrica</option>
+                <option value="Água">Água Saneago</option>
+                <option value="Aluguel">Aluguel</option>
+                <option value="Manutenção/EPI">Manutenção / EPI</option>
+              </select>
+              <input name="description" required placeholder="Descrição detalhada" class="input-premium">
+              <input name="value" type="number" step="0.01" required placeholder="Valor R$" class="input-premium">
+              <button type="submit" class="w-full py-6 btn-action btn-red uppercase text-xs">Lançar Gasto</button>
+            </form>
+          `;
+        } else if(type === 'employee') {
+          b.innerHTML = `
+            <div class="p-8 bg-slate-50 border-b flex justify-between"><h3 class="font-black text-xs uppercase">Novo Funcionário</h3><button onclick="closeModal()"><i data-lucide="x"></i></button></div>
+            <form id="f-employee" class="p-8 space-y-4">
+              <input name="name" required placeholder="Nome Completo" class="input-premium">
+              <input name="salary" type="number" step="0.01" required placeholder="Salário Base R$" class="input-premium">
+              <button type="submit" class="w-full py-6 btn-action btn-blue uppercase text-xs">Salvar</button>
+            </form>
+          `;
+        } else if(type === 'add_debt') {
+          b.innerHTML = `
+            <div class="p-8 bg-slate-50 border-b flex justify-between"><h3 class="font-black text-xs uppercase">Lançar Débito / Vale</h3><button onclick="closeModal()"><i data-lucide="x"></i></button></div>
+            <form id="f-debt" data-id="${param}" class="p-8 space-y-4">
+              <select name="type" class="input-premium">
+                <option value="advance">Vale / Adiantamento</option>
+                <option value="consumption">Consumação</option>
+              </select>
+              <input name="value" type="number" step="0.01" required placeholder="Valor R$" class="input-premium">
+              <button type="submit" class="w-full py-6 btn-action btn-blue uppercase text-xs tracking-widest">Confirmar</button>
+            </form>
+          `;
+        }
+        lucide.createIcons();
       };
 
       document.addEventListener('submit', (e) => {
@@ -429,41 +501,47 @@
         const fd = new FormData(e.target);
         const data = Object.fromEntries(fd.entries());
         const now = new Date();
-
         if(e.target.id === 'f-customer') {
           const l = DB.get('customers');
-          l.push({ id: Date.now(), ...data, washes: 0, vehicleColor: '#2563eb' });
+          l.push({ id: Date.now(), ...data });
           DB.save('customers', l); window.navigateTo('customers');
         } else if(e.target.id === 'f-service') {
           const l = DB.get('services');
           const c = DB.get('customers').find(x => String(x.id) === String(data.customerId));
-          if(c) {
-            l.push({ 
-              id: Date.now(), ...data, phone: c.phone, value: parseFloat(data.value), plate: c.plate, car: c.model, vehicleIcon: c.vehicleIcon, vehicleColor: c.vehicleColor,
-              status: 'Aguardando', paid: false, entryDate: now.toLocaleDateString('pt-BR'), entryTime: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) 
-            });
-            DB.save('services', l); window.navigateTo('patio');
-          }
-        } else if(e.target.id === 'f-edit-service') {
+          l.push({ 
+            id: Date.now(), ...data, 
+            value: parseFloat(data.value) || 0,
+            car: c.model, plate: c.plate, customerCpf: c.cpf, customerId: c.id, phone: c.phone,
+            customerAddress: `${c.address}, ${c.neighborhood}, ${c.city || 'Rio Verde-GO'}, CEP: ${c.cep}`,
+            status: 'Aguardando', paid: false, entryDate: now.toLocaleDateString('pt-BR'), entryTime: now.toLocaleTimeString('pt-BR')
+          });
+          DB.save('services', l); window.navigateTo('patio');
+        } else if(e.target.id === 'f-checkout') {
           const id = e.target.getAttribute('data-id');
           const l = DB.get('services');
           const i = l.findIndex(x => String(x.id) === String(id));
-          if(i !== -1) { l[i] = { ...l[i], ...data, value: parseFloat(data.value) }; DB.save('services', l); window.navigateTo('history'); }
-        } else if(e.target.id === 'f-payment') {
+          l[i] = { ...l[i], ...data, paid: true, status: 'Entregue' };
+          DB.save('services', l); window.navigateTo('dashboard');
+        } else if(e.target.id === 'f-expense') {
+          const l = DB.get('expenses');
+          l.push({ id: Date.now(), ...data, value: parseFloat(data.value) || 0, date: now.toLocaleDateString('pt-BR') });
+          DB.save('expenses', l); window.navigateTo('financial');
+        } else if(e.target.id === 'f-employee') {
+          const l = DB.get('employees');
+          l.push({ id: Date.now(), name: data.name, salary: parseFloat(data.salary) || 0, advances: 0, consumption: 0 });
+          DB.save('employees', l); window.navigateTo('employees');
+        } else if(e.target.id === 'f-debt') {
           const id = e.target.getAttribute('data-id');
-          const l = DB.get('services');
+          const l = DB.get('employees');
           const i = l.findIndex(x => String(x.id) === String(id));
-          if(i !== -1) {
-            l[i].paid = true; l[i].status = 'Entregue';
-            const custs = DB.get('customers');
-            const ci = custs.findIndex(x => String(x.id) === String(l[i].customerId));
-            if(ci !== -1) { custs[ci].washes = (custs[ci].washes || 0) + 1; DB.save('customers', custs); }
-            DB.save('services', l); window.navigateTo('dashboard');
-          }
+          if(data.type === 'advance') l[i].advances += parseFloat(data.value) || 0;
+          else l[i].consumption += parseFloat(data.value) || 0;
+          DB.save('employees', l); window.navigateTo('employees');
         }
         window.closeModal();
       });
 
+      window.deleteEmployee = (id) => { if(confirm('Remover funcionário?')) { const l = DB.get('employees').filter(x => String(x.id) !== String(id)); DB.save('employees', l); window.navigateTo('employees'); } };
       document.addEventListener('DOMContentLoaded', () => { window.navigateTo('dashboard'); });
     </script>
   </body>
