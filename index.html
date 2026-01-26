@@ -113,7 +113,6 @@
         document.getElementById('modal-container').classList.remove('flex');
       };
 
-      // NOVO MODAL DE CONFIRMAÇÃO DO SISTEMA
       window.openConfirmModal = (title, message, onConfirm) => {
         const b = document.getElementById('modal-box');
         const m = document.getElementById('modal-container');
@@ -315,18 +314,30 @@
                       ${services.reverse().map(s => {
                         const valNum = Number(s.value) || 0;
                         const isReceived = s.received !== false;
-                        const recMsg = `*Lava Pro - Comprovante*
+                        
+                        // MENSAGENS DIFERENTES COM BASE NO STATUS DE RECEBIMENTO
+                        let waMsg = "";
+                        if (isReceived) {
+                          waMsg = `*Lava Pro - Pagamento Recebido* ✅
 
-Olá! Aqui está o resumo do seu serviço:
+Olá! Passando para agradecer o pagamento referente ao serviço no seu veículo *${s.car}* (${s.plate}).
 
-*Veículo:* ${s.car}
-*Placa:* ${s.plate}
+Já recebemos aqui e o valor de *R$ ${valNum.toFixed(2)}* foi dado baixa no sistema. 
+
+Muito obrigado pela confiança e preferência! ✨ Até a próxima!`;
+                        } else {
+                          waMsg = `*Lava Pro - Resumo do Serviço* 📄
+
+Olá! Aqui está o resumo do seu serviço realizado em ${s.entryDate}:
+
+*Veículo:* ${s.car} (${s.plate})
 *Valor:* R$ ${valNum.toFixed(2)}
-*Data:* ${s.entryDate}
-*Pagamento:* ${s.method} (${s.term})
-*Obs:* ${s.obs || '-'}
+*Pagamento:* ${s.method}
+*Vencimento:* ${s.term}
 
-_Obrigado pela preferência!_`;
+_Favor confirmar o pagamento quando realizado. Obrigado!_`;
+                        }
+
                         return `
                         <tr class="hover:bg-slate-50 transition-colors">
                           <td class="px-8 py-5 text-xs font-bold text-slate-500">${s.entryDate}</td>
@@ -351,7 +362,9 @@ _Obrigado pela preferência!_`;
                             ${!isReceived ? `
                               <button onclick="markAsReceived('${s.id}')" title="Confirmar Recebimento" class="p-2 bg-blue-100 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all"><i data-lucide="check-circle" class="w-4 h-4"></i></button>
                             ` : ''}
-                            <button onclick="sendWA('${s.phone}', \`${recMsg}\`)" title="WhatsApp" class="p-2 bg-green-100 text-green-600 rounded-xl hover:bg-green-500 hover:text-white transition-all"><i data-lucide="send" class="w-4 h-4"></i></button>
+                            <button onclick="sendWA('${s.phone}', \`${waMsg}\`)" title="${isReceived ? 'Mandar Agradecimento' : 'Enviar Cobrança'}" class="p-2 ${isReceived ? 'bg-emerald-100 text-emerald-600' : 'bg-green-100 text-green-600'} rounded-xl hover:bg-green-500 hover:text-white transition-all">
+                              <i data-lucide="${isReceived ? 'heart' : 'send'}" class="w-4 h-4"></i>
+                            </button>
                             <button onclick="openModal('edit_service', '${s.id}')" title="Editar" class="p-2 bg-slate-100 text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
                             <button onclick="deleteService('${s.id}')" title="Excluir" class="p-2 bg-slate-100 text-slate-400 rounded-xl hover:bg-red-600 hover:text-white transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                           </td>
@@ -447,7 +460,6 @@ _Obrigado pela preferência!_`;
         }
       };
 
-      // SUBSTITUINDO CONFIRM() POR openConfirmModal()
       window.deleteService = (id) => {
         window.openConfirmModal('Excluir Lançamento', 'Deseja excluir este registro de faturamento permanentemente?', () => {
           const l = DB.get('services').filter(x => String(x.id) !== String(id));
