@@ -27,6 +27,7 @@
       .btn-green { background: var(--success); color: white; }
       .btn-whatsapp { background: var(--whatsapp); color: white; }
       .btn-red { background: var(--danger); color: white; }
+      .btn-ghost { background: #f1f5f9; color: #64748b; }
 
       .input-premium { width: 100%; padding: 14px 18px; background-color: #f1f5f9; border: 1.5px solid transparent; border-radius: 16px; font-weight: 700; outline: none; transition: all 0.2s; color: #1e293b; font-size: 14px; }
       .input-premium:focus { border-color: var(--primary); background-color: white; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08); }
@@ -110,6 +111,31 @@
       window.closeModal = () => {
         document.getElementById('modal-container').classList.add('hidden');
         document.getElementById('modal-container').classList.remove('flex');
+      };
+
+      // NOVO MODAL DE CONFIRMAÇÃO DO SISTEMA
+      window.openConfirmModal = (title, message, onConfirm) => {
+        const b = document.getElementById('modal-box');
+        const m = document.getElementById('modal-container');
+        m.classList.remove('hidden'); m.classList.add('flex');
+        b.innerHTML = `
+          <div class="p-10 flex flex-col items-center text-center">
+            <div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-6 shadow-sm">
+              <i data-lucide="alert-triangle" class="w-10 h-10"></i>
+            </div>
+            <h3 class="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tighter">${title}</h3>
+            <p class="text-slate-500 font-medium mb-8 leading-relaxed px-4">${message}</p>
+            <div class="flex gap-4 w-full">
+              <button onclick="closeModal()" class="flex-1 py-4 btn-action btn-ghost uppercase text-xs tracking-widest">Cancelar</button>
+              <button id="confirm-action-btn" class="flex-1 py-4 btn-action btn-red uppercase text-xs tracking-widest shadow-lg shadow-red-100">Confirmar</button>
+            </div>
+          </div>
+        `;
+        document.getElementById('confirm-action-btn').onclick = () => {
+          onConfirm();
+          closeModal();
+        };
+        lucide.createIcons();
       };
 
       window.sendWA = (phone, msg) => {
@@ -421,36 +447,45 @@ _Obrigado pela preferência!_`;
         }
       };
 
+      // SUBSTITUINDO CONFIRM() POR openConfirmModal()
       window.deleteService = (id) => {
-        if(confirm('Excluir este registro permanentemente?')) {
+        window.openConfirmModal('Excluir Lançamento', 'Deseja excluir este registro de faturamento permanentemente?', () => {
           const l = DB.get('services').filter(x => String(x.id) !== String(id));
           DB.save('services', l);
           window.navigateTo('financial');
-        }
+        });
       };
 
       window.deleteExpense = (id) => {
-        if(confirm('Remover esta despesa?')) {
+        window.openConfirmModal('Excluir Despesa', 'Deseja remover esta despesa do seu financeiro?', () => {
           const l = DB.get('expenses').filter(x => String(x.id) !== String(id));
           DB.save('expenses', l);
           window.navigateTo('financial');
-        }
+        });
       };
 
       window.deleteCustomer = (id) => {
-        if(confirm('Remover cliente e todos os seus veículos?')) {
+        window.openConfirmModal('Remover Cliente', 'Isso irá remover o cliente e o histórico de seus veículos. Deseja continuar?', () => {
           const l = DB.get('customers').filter(x => String(x.id) !== String(id));
           DB.save('customers', l);
           window.navigateTo('customers');
-        }
+        });
+      };
+
+      window.deleteEmployee = (id) => {
+        window.openConfirmModal('Remover Funcionário', 'Deseja desligar este colaborador do sistema?', () => {
+          const l = DB.get('employees').filter(x => String(x.id) !== String(id));
+          DB.save('employees', l);
+          window.navigateTo('employees');
+        });
       };
 
       window.resetEmployeeDebts = (id) => {
-        if(confirm('Limpar todos os vales e consumação deste funcionário?')) {
+        window.openConfirmModal('Limpar Débitos', 'Isso irá zerar todos os vales e consumação do funcionário (Fechamento do Mês). Confirma?', () => {
           const l = DB.get('employees');
           const i = l.findIndex(x => String(x.id) === String(id));
           if(i !== -1) { l[i].advances = 0; l[i].consumption = 0; DB.save('employees', l); window.navigateTo('employees'); }
-        }
+        });
       };
 
       window.openCheckoutModal = (id) => {
@@ -662,7 +697,6 @@ _Obrigado pela preferência!_`;
         window.closeModal();
       });
 
-      window.deleteEmployee = (id) => { if(confirm('Remover funcionário?')) { const l = DB.get('employees').filter(x => String(x.id) !== String(id)); DB.save('employees', l); window.navigateTo('employees'); } };
       document.addEventListener('DOMContentLoaded', () => { window.navigateTo('dashboard'); });
     </script>
   </body>
