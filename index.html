@@ -255,10 +255,15 @@
                   </div>
                   <h4 class="font-black text-slate-800 uppercase text-sm">${c.name}</h4>
                   <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">${c.cpf}</p>
-                  <div class="mt-6 space-y-3 pt-6 border-t">
-                    <p class="text-[10px] text-slate-500 font-black uppercase flex items-center gap-2"><i data-lucide="map-pin" class="w-3 h-3"></i> ${c.address || 'Sem Endereço'}</p>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase"><i data-lucide="hash" class="w-3 h-3 inline"></i> CEP: ${c.cep || '00000-000'}</p>
-                    <p class="text-xs text-slate-600 font-black"><i data-lucide="phone" class="w-3 h-3 inline"></i> ${c.phone}</p>
+                  <div class="mt-6 space-y-3 pt-6 border-t flex justify-between">
+                    <div>
+                      <p class="text-[10px] text-slate-500 font-black uppercase flex items-center gap-2"><i data-lucide="map-pin" class="w-3 h-3"></i> ${c.address || 'Sem Endereço'}</p>
+                      <p class="text-[10px] text-slate-400 font-bold uppercase"><i data-lucide="hash" class="w-3 h-3 inline"></i> CEP: ${c.cep || '00000-000'}</p>
+                      <p class="text-xs text-slate-600 font-black"><i data-lucide="phone" class="w-3 h-3 inline"></i> ${c.phone}</p>
+                    </div>
+                    <div class="flex items-end">
+                       <button onclick="deleteCustomer('${c.id}')" class="text-slate-300 hover:text-red-500 p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </div>
                   </div>
                 </div>
               `).join('') || '<p class="col-span-full text-center py-20 opacity-20 font-black">Nenhum cliente cadastrado.</p>'}
@@ -316,12 +321,13 @@ _Obrigado pela preferência!_`;
                             ${s.obs ? `<p class="text-[8px] italic text-amber-600 font-bold mt-1">"${s.obs}"</p>` : ''}
                           </td>
                           <td class="px-8 py-5 text-right font-black text-sm">R$ ${valNum.toFixed(2)}</td>
-                          <td class="px-8 py-5 text-right flex justify-end gap-2">
+                          <td class="px-8 py-5 text-right flex justify-end gap-1">
                             ${!isReceived ? `
-                              <button onclick="markAsReceived('${s.id}')" title="Confirmar Recebimento" class="p-2.5 bg-blue-100 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all"><i data-lucide="check-circle" class="w-4 h-4"></i></button>
+                              <button onclick="markAsReceived('${s.id}')" title="Confirmar Recebimento" class="p-2 bg-blue-100 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all"><i data-lucide="check-circle" class="w-4 h-4"></i></button>
                             ` : ''}
-                            <button onclick="sendWA('${s.phone}', \`${recMsg}\`)" title="Enviar Comprovante WhatsApp" class="p-2.5 bg-green-100 text-green-600 rounded-xl hover:bg-green-500 hover:text-white transition-all"><i data-lucide="send" class="w-4 h-4"></i></button>
-                            <button onclick="copyToClipboard('${s.customerCpf}', this)" title="Copiar CPF" class="p-2.5 bg-slate-100 text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                            <button onclick="sendWA('${s.phone}', \`${recMsg}\`)" title="WhatsApp" class="p-2 bg-green-100 text-green-600 rounded-xl hover:bg-green-500 hover:text-white transition-all"><i data-lucide="send" class="w-4 h-4"></i></button>
+                            <button onclick="openModal('edit_service', '${s.id}')" title="Editar" class="p-2 bg-slate-100 text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                            <button onclick="deleteService('${s.id}')" title="Excluir" class="p-2 bg-slate-100 text-slate-400 rounded-xl hover:bg-red-600 hover:text-white transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                           </td>
                         </tr>
                       `}).join('') || '<tr><td colspan="6" class="p-20 text-center opacity-30 font-black uppercase">Nenhuma receita registrada</td></tr>'}
@@ -332,7 +338,7 @@ _Obrigado pela preferência!_`;
                 <div class="glass-card overflow-hidden">
                   <table class="w-full text-left">
                     <thead class="bg-slate-50 text-[10px] font-black text-slate-400 uppercase border-b">
-                      <tr><th class="px-8 py-4">Data</th><th class="px-8 py-4">Categoria</th><th class="px-8 py-4">Descrição</th><th class="px-8 py-4 text-right">Valor</th></tr>
+                      <tr><th class="px-8 py-4">Data</th><th class="px-8 py-4">Categoria</th><th class="px-8 py-4">Descrição</th><th class="px-8 py-4 text-right">Valor</th><th class="px-8 py-4 text-right">Ações</th></tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                       ${expenses.reverse().map(e => `
@@ -341,8 +347,11 @@ _Obrigado pela preferência!_`;
                           <td class="px-8 py-5"><span class="bg-red-50 text-red-600 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase">${e.category}</span></td>
                           <td class="px-8 py-5 text-xs font-bold text-slate-600 uppercase">${e.description}</td>
                           <td class="px-8 py-5 text-right font-black text-sm text-red-600">R$ ${(Number(e.value) || 0).toFixed(2)}</td>
+                          <td class="px-8 py-5 text-right">
+                            <button onclick="deleteExpense('${e.id}')" class="text-slate-300 hover:text-red-500 p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                          </td>
                         </tr>
-                      `).join('') || '<tr><td colspan="4" class="p-20 text-center opacity-30 font-black uppercase">Nenhuma despesa registrada</td></tr>'}
+                      `).join('') || '<tr><td colspan="5" class="p-20 text-center opacity-30 font-black uppercase">Nenhuma despesa registrada</td></tr>'}
                     </tbody>
                   </table>
                 </div>
@@ -378,7 +387,10 @@ _Obrigado pela preferência!_`;
                     </div>
                     <div class="pt-6 border-t flex items-center justify-between">
                       <div><p class="text-[10px] font-black text-slate-400 uppercase">Saldo Final</p><h4 class="text-2xl font-black text-emerald-600">R$ ${netSalary.toFixed(2)}</h4></div>
-                      <button onclick="openModal('add_debt', '${e.id}')" class="bg-slate-900 text-white px-5 py-3 rounded-2xl text-[10px] font-black uppercase shadow-xl">+ Débito</button>
+                      <div class="flex gap-2">
+                         <button onclick="resetEmployeeDebts('${e.id}')" title="Limpar Débitos" class="bg-slate-100 text-slate-400 p-3 rounded-2xl hover:bg-slate-200 transition-all"><i data-lucide="refresh-cw" class="w-4 h-4"></i></button>
+                         <button onclick="openModal('add_debt', '${e.id}')" class="bg-slate-900 text-white px-5 py-3 rounded-2xl text-[10px] font-black uppercase shadow-xl">+ Débito</button>
+                      </div>
                     </div>
                   </div>
                 `;
@@ -406,6 +418,38 @@ _Obrigado pela preferência!_`;
           l[i].received = true;
           DB.save('services', l);
           window.navigateTo('financial');
+        }
+      };
+
+      window.deleteService = (id) => {
+        if(confirm('Excluir este registro permanentemente?')) {
+          const l = DB.get('services').filter(x => String(x.id) !== String(id));
+          DB.save('services', l);
+          window.navigateTo('financial');
+        }
+      };
+
+      window.deleteExpense = (id) => {
+        if(confirm('Remover esta despesa?')) {
+          const l = DB.get('expenses').filter(x => String(x.id) !== String(id));
+          DB.save('expenses', l);
+          window.navigateTo('financial');
+        }
+      };
+
+      window.deleteCustomer = (id) => {
+        if(confirm('Remover cliente e todos os seus veículos?')) {
+          const l = DB.get('customers').filter(x => String(x.id) !== String(id));
+          DB.save('customers', l);
+          window.navigateTo('customers');
+        }
+      };
+
+      window.resetEmployeeDebts = (id) => {
+        if(confirm('Limpar todos os vales e consumação deste funcionário?')) {
+          const l = DB.get('employees');
+          const i = l.findIndex(x => String(x.id) === String(id));
+          if(i !== -1) { l[i].advances = 0; l[i].consumption = 0; DB.save('employees', l); window.navigateTo('employees'); }
         }
       };
 
@@ -533,6 +577,35 @@ _Obrigado pela preferência!_`;
               <button type="submit" class="w-full py-6 btn-action btn-blue uppercase text-xs tracking-widest">Confirmar</button>
             </form>
           `;
+        } else if(type === 'edit_service') {
+          const s = DB.get('services').find(x => String(x.id) === String(param));
+          b.innerHTML = `
+            <div class="p-8 bg-slate-50 border-b flex justify-between"><h3 class="font-black text-xs uppercase">Editar Lançamento</h3><button onclick="closeModal()"><i data-lucide="x"></i></button></div>
+            <form id="f-edit-service" data-id="${param}" class="p-8 space-y-4">
+              <input name="car" required placeholder="Veículo" value="${s.car || ''}" class="input-premium uppercase">
+              <input name="plate" required placeholder="Placa" value="${s.plate || ''}" class="input-premium uppercase">
+              <input name="value" type="number" step="0.01" required placeholder="Valor R$" value="${s.value || 0}" class="input-premium">
+              <div class="grid grid-cols-2 gap-4">
+                <select name="method" class="input-premium">
+                  <option value="PIX" ${s.method === 'PIX' ? 'selected' : ''}>PIX</option>
+                  <option value="Dinheiro" ${s.method === 'Dinheiro' ? 'selected' : ''}>Dinheiro</option>
+                  <option value="Cartão Débito" ${s.method === 'Cartão Débito' ? 'selected' : ''}>Cartão Débito</option>
+                  <option value="Cartão Crédito" ${s.method === 'Cartão Crédito' ? 'selected' : ''}>Cartão Crédito</option>
+                  <option value="Boleto" ${s.method === 'Boleto' ? 'selected' : ''}>Boleto</option>
+                  <option value="Convênio" ${s.method === 'Convênio' ? 'selected' : ''}>Convênio</option>
+                </select>
+                <select name="term" class="input-premium">
+                  <option value="À Vista" ${s.term === 'À Vista' ? 'selected' : ''}>À Vista</option>
+                  <option value="10 dias" ${s.term === '10 dias' ? 'selected' : ''}>10 dias</option>
+                  <option value="15 dias" ${s.term === '15 dias' ? 'selected' : ''}>15 dias</option>
+                  <option value="20 dias" ${s.term === '20 dias' ? 'selected' : ''}>20 dias</option>
+                  <option value="30 dias" ${s.term === '30 dias' ? 'selected' : ''}>30 dias</option>
+                </select>
+              </div>
+              <textarea name="obs" placeholder="Observações" class="input-premium h-20 resize-none">${s.obs || ''}</textarea>
+              <button type="submit" class="w-full py-6 btn-action btn-blue uppercase text-xs">Salvar Alterações</button>
+            </form>
+          `;
         }
         lucide.createIcons();
       };
@@ -561,10 +634,15 @@ _Obrigado pela preferência!_`;
           const id = e.target.getAttribute('data-id');
           const l = DB.get('services');
           const i = l.findIndex(x => String(x.id) === String(id));
-          // Se for convenio ou boleto, o dinheiro ainda não caiu efetivamente (received: false)
           const isLater = data.method === 'Convênio' || data.method === 'Boleto' || data.term !== 'À Vista';
           l[i] = { ...l[i], ...data, paid: true, status: 'Entregue', received: !isLater };
           DB.save('services', l); window.navigateTo('dashboard');
+        } else if(e.target.id === 'f-edit-service') {
+          const id = e.target.getAttribute('data-id');
+          const l = DB.get('services');
+          const i = l.findIndex(x => String(x.id) === String(id));
+          l[i] = { ...l[i], ...data, value: parseFloat(data.value) || 0 };
+          DB.save('services', l); window.navigateTo('financial');
         } else if(e.target.id === 'f-expense') {
           const l = DB.get('expenses');
           l.push({ id: Date.now(), ...data, value: parseFloat(data.value) || 0, date: now.toLocaleDateString('pt-BR') });
