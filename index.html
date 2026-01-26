@@ -45,10 +45,10 @@
   <script type="importmap">
 {
   "imports": {
+    "react": "https://esm.sh/react@^19.2.4",
     "recharts": "https://esm.sh/recharts@^3.7.0",
     "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
-    "react/": "https://esm.sh/react@^19.2.4/",
-    "react": "https://esm.sh/react@^19.2.4"
+    "react/": "https://esm.sh/react@^19.2.4/"
   }
 }
 </script>
@@ -115,7 +115,6 @@
       window.sendWA = (phone, msg) => {
         if(!phone) return alert('Telefone não cadastrado!');
         const cleanPhone = phone.replace(/\D/g, '');
-        // O segredo é passar a string com as quebras reais para o encodeURIComponent
         const url = `https://wa.me/55${cleanPhone}?text=${encodeURIComponent(msg)}`;
         window.open(url, '_blank');
       };
@@ -138,7 +137,6 @@
             const inputAddr = document.querySelector('[name="address"]');
             const inputNeigh = document.querySelector('[name="neighborhood"]');
             const inputCity = document.querySelector('[name="city"]');
-            
             if(inputAddr) inputAddr.value = data.logradouro || '';
             if(inputNeigh) inputNeigh.value = data.bairro || '';
             if(inputCity) inputCity.value = `${data.localidade} - ${data.uf}`;
@@ -173,19 +171,20 @@
 
       const views = {
         dashboard: () => {
-          const services = DB.get('services').filter(s => s.paid);
+          const allServices = DB.get('services');
+          const paidServices = allServices.filter(s => s.paid && s.received !== false);
           const expenses = DB.get('expenses');
-          const totalIncome = services.reduce((a, b) => a + (Number(b.value) || 0), 0);
+          const totalIncome = paidServices.reduce((a, b) => a + (Number(b.value) || 0), 0);
           const totalExpense = expenses.reduce((a, b) => a + (Number(b.value) || 0), 0);
           return `
             <div class="animate-in space-y-8">
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="glass-card p-8 bg-blue-600 text-white shadow-2xl">
-                  <p class="text-[10px] font-black uppercase opacity-60 tracking-widest">Saldo Real</p>
+                  <p class="text-[10px] font-black uppercase opacity-60 tracking-widest">Saldo Real (Em Caixa)</p>
                   <h3 class="text-4xl font-black mt-2">R$ ${(totalIncome - totalExpense).toFixed(2)}</h3>
                 </div>
                 <div class="glass-card p-8 border-l-8 border-l-emerald-500">
-                  <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Entradas (Pagos)</p>
+                  <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Entradas Confirmadas</p>
                   <h3 class="text-3xl font-black text-slate-800 mt-2">R$ ${totalIncome.toFixed(2)}</h3>
                 </div>
                 <div class="glass-card p-8 border-l-8 border-l-red-500">
@@ -194,7 +193,7 @@
                 </div>
               </div>
               <div class="glass-card p-10 bg-slate-900 text-white flex items-center justify-between">
-                <div><h4 class="font-black text-blue-400 text-xs tracking-widest uppercase">Prazos & Pagamentos</h4><p class="text-sm opacity-60">Prazos de 10, 15, 20 e 30 dias ativos.</p></div>
+                <div><h4 class="font-black text-blue-400 text-xs tracking-widest uppercase">Gerenciamento de Fluxo</h4><p class="text-sm opacity-60">Controle pagamentos à vista, prazo e convênios.</p></div>
                 <button onclick="navigateTo('patio')" class="px-6 py-3 bg-blue-600 rounded-xl font-bold text-xs uppercase shadow-xl">Ver Pátio Ativo</button>
               </div>
             </div>
@@ -205,26 +204,37 @@
           return `
             <div class="animate-in grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               ${services.map(s => {
+                const isReady = s.status === 'Pronto';
                 const msgPronto = `Olá! O seu veículo *${s.car}* (${s.plate}) já está *PRONTO* aqui no Lava Pro! ✨ Pode vir buscar quando quiser.`;
                 return `
-                <div class="glass-card p-6 border-l-[12px] ${s.status === 'Pronto' ? 'border-l-emerald-500 bg-emerald-50/10' : (s.status === 'Em Lavagem' ? 'border-l-blue-500' : 'border-l-amber-500')}">
+                <div class="glass-card p-6 border-l-[12px] ${isReady ? 'border-l-emerald-500 bg-emerald-50/10' : (s.status === 'Em Lavagem' ? 'border-l-blue-500' : 'border-l-amber-500')}">
                   <div class="flex items-center gap-4 mb-5">
                     <div class="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600"><i data-lucide="car"></i></div>
                     <div class="flex-1 min-w-0">
                       <h4 class="font-black uppercase text-sm truncate">${s.car}</h4>
                       <span class="bg-slate-900 text-white px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest">${s.plate}</span>
                     </div>
-                    <button onclick="sendWA('${s.phone}', '${msgPronto}')" class="w-12 h-12 bg-green-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-green-100 hover:scale-105 transition-all" title="Avisar que está pronto">
+                    <button onclick="sendWA('${s.phone}', \`${msgPronto}\`)" class="w-12 h-12 bg-green-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-green-100 hover:scale-105 transition-all" title="Avisar que está pronto">
                       <i data-lucide="message-circle"></i>
                     </button>
                   </div>
+                  
                   <div class="space-y-4">
-                    <select onchange="updateStatus('${s.id}', this.value)" class="w-full bg-slate-100 p-4 rounded-2xl text-[10px] font-black uppercase outline-none cursor-pointer">
-                      <option value="Aguardando" ${s.status === 'Aguardando' ? 'selected' : ''}>⏳ Na Fila</option>
-                      <option value="Em Lavagem" ${s.status === 'Em Lavagem' ? 'selected' : ''}>🫧 Lavando...</option>
-                      <option value="Pronto" ${s.status === 'Pronto' ? 'selected' : ''}>✨ Finalizado</option>
-                      <option value="Entregue">🚀 Entregar & Receber</option>
-                    </select>
+                    <div class="bg-slate-100 p-4 rounded-2xl">
+                       <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Status Atual</p>
+                       <select onchange="updateStatus('${s.id}', this.value)" class="w-full bg-transparent text-[10px] font-black uppercase outline-none cursor-pointer">
+                        <option value="Aguardando" ${s.status === 'Aguardando' ? 'selected' : ''}>⏳ Na Fila</option>
+                        <option value="Em Lavagem" ${s.status === 'Em Lavagem' ? 'selected' : ''}>🫧 Lavando...</option>
+                        <option value="Pronto" ${s.status === 'Pronto' ? 'selected' : ''}>✨ Finalizado</option>
+                        <option value="Entregue">🚀 Entregue</option>
+                      </select>
+                    </div>
+
+                    ${isReady ? `
+                      <button onclick="openCheckoutModal('${s.id}')" class="w-full py-4 btn-action btn-green uppercase text-[10px] tracking-widest shadow-xl shadow-emerald-100 animate-pulse">
+                        <i data-lucide="banknote"></i> Receber R$ ${(Number(s.value) || 0).toFixed(2)}
+                      </button>
+                    ` : ''}
                   </div>
                 </div>
               `}).join('') || '<div class="col-span-full py-20 text-center opacity-20 font-black uppercase tracking-widest">Nenhum veículo no pátio</div>'}
@@ -268,12 +278,12 @@
                 <div class="glass-card overflow-hidden">
                   <table class="w-full text-left">
                     <thead class="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b">
-                      <tr><th class="px-8 py-4">Data</th><th class="px-8 py-4">Cliente/Endereço</th><th class="px-8 py-4">Pagamento/Prazo</th><th class="px-8 py-4 text-right">Valor</th><th class="px-8 py-4 text-right">Ações</th></tr>
+                      <tr><th class="px-8 py-4">Data</th><th class="px-8 py-4">Status</th><th class="px-8 py-4">Cliente/Endereço</th><th class="px-8 py-4">Pagamento/Prazo</th><th class="px-8 py-4 text-right">Valor</th><th class="px-8 py-4 text-right">Ações</th></tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                       ${services.reverse().map(s => {
                         const valNum = Number(s.value) || 0;
-                        // Correção das quebras de linha para o WhatsApp (usando \n em vez de %0A)
+                        const isReceived = s.received !== false;
                         const recMsg = `*Lava Pro - Comprovante*
 
 Olá! Aqui está o resumo do seu serviço:
@@ -290,6 +300,12 @@ _Obrigado pela preferência!_`;
                         <tr class="hover:bg-slate-50 transition-colors">
                           <td class="px-8 py-5 text-xs font-bold text-slate-500">${s.entryDate}</td>
                           <td class="px-8 py-5">
+                            ${isReceived 
+                              ? `<span class="bg-emerald-100 text-emerald-600 px-2 py-1 rounded text-[9px] font-black uppercase">PAGO</span>`
+                              : `<span class="bg-amber-100 text-amber-600 px-2 py-1 rounded text-[9px] font-black uppercase">PENDENTE</span>`
+                            }
+                          </td>
+                          <td class="px-8 py-5">
                             <p class="font-black text-xs uppercase text-slate-800">${s.car}</p>
                             <p class="text-[9px] text-slate-400 font-bold">${s.customerCpf || 'Sem CPF'}</p>
                             <p class="text-[8px] text-slate-300 font-bold uppercase truncate max-w-[140px]">${s.customerAddress || ''}</p>
@@ -301,12 +317,14 @@ _Obrigado pela preferência!_`;
                           </td>
                           <td class="px-8 py-5 text-right font-black text-sm">R$ ${valNum.toFixed(2)}</td>
                           <td class="px-8 py-5 text-right flex justify-end gap-2">
+                            ${!isReceived ? `
+                              <button onclick="markAsReceived('${s.id}')" title="Confirmar Recebimento" class="p-2.5 bg-blue-100 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all"><i data-lucide="check-circle" class="w-4 h-4"></i></button>
+                            ` : ''}
                             <button onclick="sendWA('${s.phone}', \`${recMsg}\`)" title="Enviar Comprovante WhatsApp" class="p-2.5 bg-green-100 text-green-600 rounded-xl hover:bg-green-500 hover:text-white transition-all"><i data-lucide="send" class="w-4 h-4"></i></button>
                             <button onclick="copyToClipboard('${s.customerCpf}', this)" title="Copiar CPF" class="p-2.5 bg-slate-100 text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all"><i data-lucide="copy" class="w-4 h-4"></i></button>
-                            <button onclick="copyToClipboard('${s.term}', this)" title="Copiar Prazo" class="p-2.5 bg-slate-100 text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all"><i data-lucide="calendar" class="w-4 h-4"></i></button>
                           </td>
                         </tr>
-                      `}).join('') || '<tr><td colspan="5" class="p-20 text-center opacity-30 font-black uppercase">Nenhuma receita registrada</td></tr>'}
+                      `}).join('') || '<tr><td colspan="6" class="p-20 text-center opacity-30 font-black uppercase">Nenhuma receita registrada</td></tr>'}
                     </tbody>
                   </table>
                 </div>
@@ -381,6 +399,16 @@ _Obrigado pela preferência!_`;
         }
       };
 
+      window.markAsReceived = (id) => {
+        const l = DB.get('services');
+        const i = l.findIndex(x => String(x.id) === String(id));
+        if(i !== -1) {
+          l[i].received = true;
+          DB.save('services', l);
+          window.navigateTo('financial');
+        }
+      };
+
       window.openCheckoutModal = (id) => {
         const s = DB.get('services').find(x => String(x.id) === String(id));
         const valNum = Number(s.value) || 0;
@@ -388,7 +416,7 @@ _Obrigado pela preferência!_`;
         const m = document.getElementById('modal-container');
         m.classList.remove('hidden'); m.classList.add('flex');
         b.innerHTML = `
-          <div class="p-8 bg-slate-50 border-b flex justify-between items-center"><h3 class="font-black text-xs uppercase tracking-widest">Receber & Entregar</h3><button onclick="closeModal()"><i data-lucide="x"></i></button></div>
+          <div class="p-8 bg-slate-50 border-b flex justify-between items-center"><h3 class="font-black text-xs uppercase tracking-widest">Finalizar Pagamento</h3><button onclick="closeModal()"><i data-lucide="x"></i></button></div>
           <form id="f-checkout" data-id="${id}" class="p-8 space-y-5">
             <div class="p-8 bg-blue-600 text-white rounded-[2rem] text-center shadow-xl shadow-blue-100">
               <p class="text-[10px] font-black uppercase opacity-60">Valor do Serviço</p>
@@ -421,10 +449,10 @@ _Obrigado pela preferência!_`;
 
             <div>
               <label class="text-[10px] font-black uppercase text-slate-400 mb-2 block">Observações / Notas</label>
-              <textarea name="obs" placeholder="Ex: Cliente pediu para faturar no CNPJ..." class="input-premium h-24 resize-none"></textarea>
+              <textarea name="obs" placeholder="Anotações para a nota ou controle..." class="input-premium h-24 resize-none"></textarea>
             </div>
 
-            <button type="submit" class="w-full py-6 btn-action btn-green uppercase text-xs tracking-widest shadow-2xl">Confirmar Pagamento</button>
+            <button type="submit" class="w-full py-6 btn-action btn-green uppercase text-xs tracking-widest shadow-2xl">Confirmar Pagamento Realizado</button>
           </form>
         `;
         lucide.createIcons();
@@ -533,7 +561,9 @@ _Obrigado pela preferência!_`;
           const id = e.target.getAttribute('data-id');
           const l = DB.get('services');
           const i = l.findIndex(x => String(x.id) === String(id));
-          l[i] = { ...l[i], ...data, paid: true, status: 'Entregue' };
+          // Se for convenio ou boleto, o dinheiro ainda não caiu efetivamente (received: false)
+          const isLater = data.method === 'Convênio' || data.method === 'Boleto' || data.term !== 'À Vista';
+          l[i] = { ...l[i], ...data, paid: true, status: 'Entregue', received: !isLater };
           DB.save('services', l); window.navigateTo('dashboard');
         } else if(e.target.id === 'f-expense') {
           const l = DB.get('expenses');
