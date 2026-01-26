@@ -45,10 +45,10 @@
   <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@^19.2.3",
-    "recharts": "https://esm.sh/recharts@^3.6.0",
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
-    "react/": "https://esm.sh/react@^19.2.3/"
+    "recharts": "https://esm.sh/recharts@^3.7.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4"
   }
 }
 </script>
@@ -115,6 +115,7 @@
       window.sendWA = (phone, msg) => {
         if(!phone) return alert('Telefone não cadastrado!');
         const cleanPhone = phone.replace(/\D/g, '');
+        // O segredo é passar a string com as quebras reais para o encodeURIComponent
         const url = `https://wa.me/55${cleanPhone}?text=${encodeURIComponent(msg)}`;
         window.open(url, '_blank');
       };
@@ -204,7 +205,7 @@
           return `
             <div class="animate-in grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               ${services.map(s => {
-                const msgPronto = `Olá! O seu veículo ${s.car} (${s.plate}) já está PRONTO aqui no Lava Pro! ✨ Pode vir buscar quando quiser.`;
+                const msgPronto = `Olá! O seu veículo *${s.car}* (${s.plate}) já está *PRONTO* aqui no Lava Pro! ✨ Pode vir buscar quando quiser.`;
                 return `
                 <div class="glass-card p-6 border-l-[12px] ${s.status === 'Pronto' ? 'border-l-emerald-500 bg-emerald-50/10' : (s.status === 'Em Lavagem' ? 'border-l-blue-500' : 'border-l-amber-500')}">
                   <div class="flex items-center gap-4 mb-5">
@@ -271,8 +272,20 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                       ${services.reverse().map(s => {
-                        const val = Number(s.value) || 0;
-                        const recMsg = `*Lava Pro - Comprovante*%0A%0AOlá! Aqui está o resumo do seu serviço:%0A*Veículo:* ${s.car}%0A*Placa:* ${s.plate}%0A*Valor:* R$ ${val.toFixed(2)}%0A*Data:* ${s.entryDate}%0A*Pagamento:* ${s.method} (${s.term})%0A*Obs:* ${s.obs || '-'}%0A%0A_Obrigado pela preferência!_`;
+                        const valNum = Number(s.value) || 0;
+                        // Correção das quebras de linha para o WhatsApp (usando \n em vez de %0A)
+                        const recMsg = `*Lava Pro - Comprovante*
+
+Olá! Aqui está o resumo do seu serviço:
+
+*Veículo:* ${s.car}
+*Placa:* ${s.plate}
+*Valor:* R$ ${valNum.toFixed(2)}
+*Data:* ${s.entryDate}
+*Pagamento:* ${s.method} (${s.term})
+*Obs:* ${s.obs || '-'}
+
+_Obrigado pela preferência!_`;
                         return `
                         <tr class="hover:bg-slate-50 transition-colors">
                           <td class="px-8 py-5 text-xs font-bold text-slate-500">${s.entryDate}</td>
@@ -286,9 +299,9 @@
                             <p class="text-[9px] font-bold text-slate-400 uppercase">${s.term || 'À Vista'}</p>
                             ${s.obs ? `<p class="text-[8px] italic text-amber-600 font-bold mt-1">"${s.obs}"</p>` : ''}
                           </td>
-                          <td class="px-8 py-5 text-right font-black text-sm">R$ ${val.toFixed(2)}</td>
+                          <td class="px-8 py-5 text-right font-black text-sm">R$ ${valNum.toFixed(2)}</td>
                           <td class="px-8 py-5 text-right flex justify-end gap-2">
-                            <button onclick="sendWA('${s.phone}', '${recMsg}')" title="Enviar Comprovante WhatsApp" class="p-2.5 bg-green-100 text-green-600 rounded-xl hover:bg-green-500 hover:text-white transition-all"><i data-lucide="send" class="w-4 h-4"></i></button>
+                            <button onclick="sendWA('${s.phone}', \`${recMsg}\`)" title="Enviar Comprovante WhatsApp" class="p-2.5 bg-green-100 text-green-600 rounded-xl hover:bg-green-500 hover:text-white transition-all"><i data-lucide="send" class="w-4 h-4"></i></button>
                             <button onclick="copyToClipboard('${s.customerCpf}', this)" title="Copiar CPF" class="p-2.5 bg-slate-100 text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all"><i data-lucide="copy" class="w-4 h-4"></i></button>
                             <button onclick="copyToClipboard('${s.term}', this)" title="Copiar Prazo" class="p-2.5 bg-slate-100 text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all"><i data-lucide="calendar" class="w-4 h-4"></i></button>
                           </td>
@@ -370,7 +383,7 @@
 
       window.openCheckoutModal = (id) => {
         const s = DB.get('services').find(x => String(x.id) === String(id));
-        const val = Number(s.value) || 0;
+        const valNum = Number(s.value) || 0;
         const b = document.getElementById('modal-box');
         const m = document.getElementById('modal-container');
         m.classList.remove('hidden'); m.classList.add('flex');
@@ -379,7 +392,7 @@
           <form id="f-checkout" data-id="${id}" class="p-8 space-y-5">
             <div class="p-8 bg-blue-600 text-white rounded-[2rem] text-center shadow-xl shadow-blue-100">
               <p class="text-[10px] font-black uppercase opacity-60">Valor do Serviço</p>
-              <h2 class="text-5xl font-black mt-2">R$ ${val.toFixed(2)}</h2>
+              <h2 class="text-5xl font-black mt-2">R$ ${valNum.toFixed(2)}</h2>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
